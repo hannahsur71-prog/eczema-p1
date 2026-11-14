@@ -147,7 +147,7 @@ private struct StepIllustration: View {
         switch kind {
         case .warm: return "hands.clap"
         case .glide: return "hand.draw"
-        case .pat: return "hand.raised"
+        case .pat: return "hand.point.up.left"
         case .calm: return "arrow.clockwise.circle"
         }
     }
@@ -156,7 +156,7 @@ private struct StepIllustration: View {
         switch kind {
         case .warm: return "Rub your palms together to warm the lotion"
         case .glide: return "Long, slow glide along the skin"
-        case .pat: return "Soft press with a flat palm, then lift"
+        case .pat: return "Gently smooth the cream on, no massage"
         case .calm: return "Big, slow circles on the back"
         }
     }

@@ -30,10 +30,15 @@ scripts/check-fonts.sh          Fails if any screen styles fonts outside the des
 ```
 
 ## The funnel
-Promise → names → age → 7-question quiz → usual eczema areas → analyzing → results (struggle score) →
-"you're not alone" (sourced stats) → how it helps (timeline + studies) → founder story / real reviews →
-features as outcomes → bedtime reminder → building your plan → custom plan → **1-minute taste of the
-ritual** → first win (+ rating prompt) → paywall.
+Promise → founder story (mom's massage, glow-star ceiling) → child's name → age → your relationship
+(Lumi's stories then say "Mommy", "Grandpa"…) → your name → eczema areas → then question → cited insight:
+night waking → "7 in 10 kids" · lotion time → "it's not you" · touch response → adapted plan ·
+AAD + 1998 study on massage · bedtime length, parent sleep, feelings → "it helps you too" (2023 trials) ·
+what you've tried · goals → struggle score → transformation timeline → features → reminder →
+building the plan → custom plan → **1-minute taste of Lumi's massage story** → first win → paywall.
+A glowing star travels the progress bar.
+
+Safety rule from the AAD: no massage on actively flaring skin. Flaring areas get gentle smoothing only.
 
 Paywall rules: the headline remembers the goal they picked; yearly preselected and shown per month;
 7-day free trial on yearly only; an honest timeline with the real price and charge date; trial reminder

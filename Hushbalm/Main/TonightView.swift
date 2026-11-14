@@ -86,7 +86,8 @@ struct TonightView: View {
             .fullScreenCover(isPresented: $showRitual) {
                 RitualPlayerView(
                     steps: RitualBuilder.steps(for: appState.tonightZones,
-                                               story: MassageStoryLibrary.story(effectiveMassageStoryID)),
+                                               story: MassageStoryLibrary.story(effectiveMassageStoryID),
+                                               grownUp: appState.answers.relationship.storyName),
                     story: StoryLibrary.story(effectiveStoryID),
                     minutes: effectiveMinutes)
             }

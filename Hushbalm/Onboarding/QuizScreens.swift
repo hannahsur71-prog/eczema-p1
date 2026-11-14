@@ -38,8 +38,8 @@ struct ParentNameScreen: View {
     var body: some View {
         @Bindable var state = appState
         OnboardingScaffold {
-            HBScreenHeader(eyebrow: "About you", title: "First, what should we call you?",
-                           subtitle: "We'll use it to personalize your plan.")
+            HBScreenHeader(eyebrow: "About you", title: "And what's your first name?",
+                           subtitle: "So \(appState.answers.displayChild)'s plan can be made for both of you.")
             NameField(placeholder: "Your first name", text: $state.answers.parentName, focused: $focused)
         } footer: {
             Button("Continue", action: next).buttonStyle(.hbPrimary)
@@ -57,9 +57,9 @@ struct ChildNameScreen: View {
         @Bindable var state = appState
         OnboardingScaffold {
             HBScreenHeader(eyebrow: "About your child",
-                           title: "Nice to meet you, \(appState.answers.displayParent). Who are we tucking in?",
-                           subtitle: "Their first name, so the ritual feels like theirs.")
-            NameField(placeholder: "Child's first name", text: $state.answers.childName, focused: $focused)
+                           title: "Who are we tucking in tonight?",
+                           subtitle: "A name or nickname. Lumi will use it, so the ritual feels like theirs.")
+            NameField(placeholder: "Name or nickname", text: $state.answers.childName, focused: $focused)
         } footer: {
             Button("Continue", action: next).buttonStyle(.hbPrimary)
         }
@@ -104,7 +104,7 @@ struct AgeScreen: View {
     var body: some View {
         OnboardingScaffold {
             HBScreenHeader(eyebrow: "About \(appState.answers.displayChild)",
-                           title: "How old is \(appState.answers.displayChild)?",
+                           title: "What a lovely name. How old is \(appState.answers.displayChild)?",
                            subtitle: "We'll choose gentle techniques and story lengths that fit.")
             VStack(spacing: HBSpacing.sm) {
                 ForEach(AgeGroup.allCases) { group in

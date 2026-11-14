@@ -52,7 +52,8 @@ struct TasteRitualScreen: View {
 
     private func start() {
         let zone = firstZone
-        let steps = RitualBuilder.steps(for: [zone: .dry], story: MassageStoryLibrary.sleepyComet)
+        let steps = RitualBuilder.steps(for: [zone: .dry], story: MassageStoryLibrary.sleepyComet,
+                                       grownUp: appState.answers.relationship.storyName)
         let ritual = RitualEngine(steps: steps, story: StoryLibrary.otter, minutes: 1,
                                   includesStory: false, stepSecondsOverride: 20)
         engine = ritual

@@ -1,20 +1,30 @@
 import SwiftUI
 import HushbalmDesignSystem
 
-/// The onboarding funnel. Structure follows the proven sleep-app pattern
-/// (personal quiz → results → "you're not alone" → how it helps → social proof →
-/// features → reminder → building your plan → custom plan → a 1-minute taste of the
-/// ritual (the "gotcha moment") → first win → paywall that remembers their goal),
-/// with copy that sells the transformation, not the features.
+/// The onboarding funnel, rebuilt around eczema families.
+/// Rhythm: question → insight → question → insight (each insight cited), then the
+/// struggle score, the transformation, a 1-minute taste of the ritual and the paywall.
 enum OnboardingStep: Hashable {
-    case welcome, parentName, childName, age
-    case quiz(Int)
-    case zones, analyzing, results, notAlone, howItHelps, socialProof, features, reminder, buildingPlan, plan, taste, firstWin
+    case welcome, founder, childName, age, relationship, parentName, zones
+    case quiz(String)
+    case insight(Insight)
+    case analyzing, results, howItHelps, socialProof, features, reminder, buildingPlan, plan, taste, firstWin
 
     static var ordered: [OnboardingStep] {
-        [.welcome, .parentName, .childName, .age]
-        + QuizBank.questions.indices.map { OnboardingStep.quiz($0) }
-        + [.zones, .analyzing, .results, .notAlone, .howItHelps, .socialProof, .features, .reminder, .buildingPlan, .plan, .taste, .firstWin]
+        var steps: [OnboardingStep] = [
+            .welcome, .founder, .childName, .age, .relationship, .parentName, .zones,
+            .quiz("nightWaking"), .insight(.sleepFacts),
+            .quiz("lotionTime"), .insight(.notYou),
+            .quiz("touch"), .insight(.touchAdapt),
+            .insight(.massageEvidence),
+            .quiz("bedtimeLength"), .quiz("parentSleep"), .quiz("bedtimeFeeling"), .insight(.parentToo),
+            .quiz("tried"), .quiz("goals"),
+            .analyzing, .results, .howItHelps
+        ]
+        // Real reviews only: the screen appears once you have them.
+        if !AppConfig.testimonials.isEmpty { steps.append(.socialProof) }
+        steps += [.features, .reminder, .buildingPlan, .plan, .taste, .firstWin]
+        return steps
     }
 
     /// Screens that run themselves and shouldn't show back/progress.
@@ -47,7 +57,7 @@ struct OnboardingFlow: View {
     private var topBar: some View {
         HStack(spacing: HBSpacing.sm) {
             HBIconButton(.back, accessibilityLabel: "Back") { back() }
-            HBProgressBar(progress: Double(index) / Double(steps.count - 1))
+            HBStarProgress(progress: Double(index) / Double(steps.count - 1))
         }
         .padding(.horizontal, HBSpacing.screenGutter)
         .padding(.top, HBSpacing.xs)
@@ -57,14 +67,19 @@ struct OnboardingFlow: View {
     private func screen(for step: OnboardingStep) -> some View {
         switch step {
         case .welcome: WelcomeScreen(next: next)
-        case .parentName: ParentNameScreen(next: next)
+        case .founder: FounderScreen(next: next)
         case .childName: ChildNameScreen(next: next)
         case .age: AgeScreen(next: next)
-        case .quiz(let number): QuizScreen(question: QuizBank.questions[number], next: next)
+        case .relationship: RelationshipScreen(next: next)
+        case .parentName: ParentNameScreen(next: next)
         case .zones: ZonesScreen(next: next)
+        case .quiz(let id):
+            if let question = QuizBank.question(id) {
+                QuizScreen(question: question, next: next)
+            }
+        case .insight(let insight): InsightScreen(insight: insight, next: next)
         case .analyzing: AnalyzingScreen(next: next)
         case .results: ResultsScreen(next: next)
-        case .notAlone: NotAloneScreen(next: next)
         case .howItHelps: HowItHelpsScreen(next: next)
         case .socialProof: SocialProofScreen(next: next)
         case .features: FeaturesScreen(next: next)

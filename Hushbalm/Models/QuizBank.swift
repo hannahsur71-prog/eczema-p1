@@ -22,19 +22,19 @@ struct QuizQuestion: Identifiable, Hashable {
     }
 }
 
-/// The quiz. Order follows the proven sleep-app pattern:
-/// child's problem → bedtime reality → parent's own feelings → goals.
+/// The quiz. Each question is followed in the flow by a short insight screen
+/// (question → insight → question), the rhythm the category leaders use.
 enum QuizBank {
     static let questions: [QuizQuestion] = [
         QuizQuestion(
-            id: "bedtimeLength",
-            title: "How long does bedtime take with {child} right now?",
-            subtitle: "From bath to asleep.",
+            id: "nightWaking",
+            title: "How often does {child} wake up scratching?",
+            subtitle: nil,
             options: [
-                QuizOption(id: "under20", title: "Under 20 minutes", weight: 0),
-                QuizOption(id: "20to45", title: "20–45 minutes", weight: 1),
-                QuizOption(id: "45to90", title: "45–90 minutes", weight: 2),
-                QuizOption(id: "over90", title: "Over 90 minutes", weight: 3)
+                QuizOption(id: "rarely", title: "Rarely", weight: 0),
+                QuizOption(id: "weekly", title: "A few nights a week", weight: 1),
+                QuizOption(id: "nightly", title: "Most nights", weight: 2),
+                QuizOption(id: "multiple", title: "Several times every night", weight: 3)
             ]
         ),
         QuizQuestion(
@@ -49,14 +49,26 @@ enum QuizBank {
             ]
         ),
         QuizQuestion(
-            id: "nightWaking",
-            title: "How often does {child} wake up scratching?",
-            subtitle: nil,
+            id: "touch",
+            title: "In general, how does {child} respond to touch?",
+            subtitle: "We'll adapt the massage to fit.",
             options: [
-                QuizOption(id: "rarely", title: "Rarely", weight: 0),
-                QuizOption(id: "weekly", title: "A few nights a week", weight: 1),
-                QuizOption(id: "nightly", title: "Most nights", weight: 2),
-                QuizOption(id: "multiple", title: "Several times every night", weight: 3)
+                QuizOption(id: "loves", title: "Loves cuddles and back rubs"),
+                QuizOption(id: "ok", title: "Okay with it"),
+                QuizOption(id: "ticklish", title: "Super ticklish"),
+                QuizOption(id: "notFan", title: "Not a big fan"),
+                QuizOption(id: "sensitive", title: "Their skin often feels sore or sensitive")
+            ]
+        ),
+        QuizQuestion(
+            id: "bedtimeLength",
+            title: "How long does bedtime take with {child} right now?",
+            subtitle: "From bath to asleep.",
+            options: [
+                QuizOption(id: "under20", title: "Under 20 minutes", weight: 0),
+                QuizOption(id: "20to45", title: "20–45 minutes", weight: 1),
+                QuizOption(id: "45to90", title: "45–90 minutes", weight: 2),
+                QuizOption(id: "over90", title: "Over 90 minutes", weight: 3)
             ]
         ),
         QuizQuestion(
@@ -96,14 +108,14 @@ enum QuizBank {
         ),
         QuizQuestion(
             id: "goals",
-            title: "If bedtime got easier, what would change for you?",
-            subtitle: "Select all that matter.",
+            title: "What would you most like to help {child} with?",
+            subtitle: "Pick the most important first.",
             options: [
-                QuizOption(id: "connection", title: "More calm, close time with {child}"),
-                QuizOption(id: "sleep", title: "I'd finally sleep through the night"),
-                QuizOption(id: "evenings", title: "I'd get my evenings back"),
-                QuizOption(id: "noFights", title: "No more lotion fights"),
-                QuizOption(id: "confidence", title: "I'd feel like I'm doing it right")
+                QuizOption(id: "noFights", title: "Lotion time without the fight"),
+                QuizOption(id: "sleep", title: "Sleeping through the night, for both of us"),
+                QuizOption(id: "connection", title: "More calm, close time together"),
+                QuizOption(id: "confidence", title: "Feeling good in their own skin"),
+                QuizOption(id: "evenings", title: "Getting my evenings back")
             ],
             allowsMultiple: true
         )

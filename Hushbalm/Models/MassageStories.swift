@@ -31,7 +31,7 @@ enum MassageStoryLibrary {
         title: "Lumi and the Sleepy Comet",
         ages: "Ages 1–5",
         blurb: "Lumi follows a yawning comet across a soft, sleepy sky.",
-        opening: "High above the rooftops lives Lumi, the Star Catcher. Lumi has a little silver net and very gentle hands. Tonight, a sleepy comet is drifting by. Let's warm our hands, nice and slow, so we're ready to follow it.",
+        opening: "High above the rooftops lives Lumi, the Star Catcher. Lumi has a little silver net and very gentle hands, just like {grownup}. Tonight, a sleepy comet is drifting by. {Grownup} is warming the magic cream, nice and slow, so we're ready to follow it.",
         zoneScenes: [
             .face: "The comet floats past your cheeks, whoosh, soft as a feather, and tickles your forehead goodnight.",
             .neck: "Down, down, the comet slides along the hill of your neck. Gentle. Slow.",
@@ -44,7 +44,7 @@ enum MassageStoryLibrary {
             .knees: "It tucks into the little hideout behind your knee, then slides out, whoosh.",
             .feet: "Lumi gives each toe a sleepy star. Night night, toes."
         ],
-        flareScene: "Here, on your {area}, the stars are tender tonight. So Lumi doesn't slide. Lumi just taps, tap, tap, soft as snowflakes landing.",
+        flareScene: "Here, on your {area}, the stars are tender tonight. So Lumi doesn't slide or rub. Lumi just lays a soft blanket of cream, light as a snowflake, and lets this spot rest.",
         closing: "The sleepy comet gives one last big yawn. Lumi catches it in the silver net, so gently, and climbs up to your ceiling to stick it there, glowing. Big, slow circles now, like the comet going round and round to sleep.",
         affirmation: "My skin is healing. I am safe. I am loved."
     )
@@ -55,7 +55,7 @@ enum MassageStoryLibrary {
         title: "Lumi Catches the Last Star",
         ages: "Ages 4–8",
         blurb: "One star is still awake, and only Lumi can help it find its place.",
-        opening: "Every night, when the town goes quiet, Lumi the Star Catcher climbs the tallest ladder in the world. Tonight, every star is tucked into the sky except one, a small, shy star still wandering about. Let's warm our hands so we can help Lumi find it.",
+        opening: "Every night, when the town goes quiet, Lumi the Star Catcher climbs the tallest ladder in the world. Tonight, every star is tucked into the sky except one, a small, shy star still wandering about. While {grownup} warms the cream, let's get ready to help Lumi find it.",
         zoneScenes: [
             .face: "Lumi checks behind the clouds of your cheeks, light as a breath, and around the hill of your forehead. Not here.",
             .neck: "Lumi tiptoes down the quiet path of your neck, step by careful step.",
@@ -68,13 +68,20 @@ enum MassageStoryLibrary {
             .knees: "Behind your knee is a secret tunnel. Lumi slides through, slow and careful. Still no star.",
             .feet: "At the very bottom of the world, by your toes, Lumi finds something warm and glowing."
         ],
-        flareScene: "On your {area}, the sky is tender tonight. Lumi knows just what to do: no sliding here, only soft taps, like raindrops on a window, tap, tap, tap.",
+        flareScene: "On your {area}, the sky is tender tonight. Lumi knows just what to do: no sliding here. Just a soft, cool layer of cream, gentle as moonlight, and then this spot gets to rest.",
         closing: "There it is, the last little star, curled up and sleepy. Lumi scoops it into the silver net and carries it all the way up to your ceiling, where it glows softly, right above you. Now big, slow circles, like the whole sky settling down to sleep.",
         affirmation: "I am brave. I am more than my skin. I am loved."
     )
 }
 
 extension MassageStory {
+    /// Fills in how the child hears their grown-up ("Mommy", "Grandpa"...).
+    static func personalize(_ text: String, grownUp: String) -> String {
+        let capitalized = grownUp.prefix(1).uppercased() + grownUp.dropFirst()
+        return text.replacingOccurrences(of: "{Grownup}", with: capitalized)
+            .replacingOccurrences(of: "{grownup}", with: grownUp)
+    }
+
     func scene(for zone: CareZone, state: CareState) -> String {
         if state == .flaring {
             return flareScene.replacingOccurrences(of: "{area}", with: zone.label.lowercased())

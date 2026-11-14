@@ -12,11 +12,37 @@ enum AgeGroup: String, Codable, CaseIterable, Identifiable {
     }
 }
 
+/// Who is doing bedtime. Lumi's stories mention them by this name.
+enum Relationship: String, Codable, CaseIterable, Identifiable {
+    case mom, dad, grandma, grandpa, other
+    var id: String { rawValue }
+    var label: String {
+        switch self {
+        case .mom: return "Mom"
+        case .dad: return "Dad"
+        case .grandma: return "Grandma"
+        case .grandpa: return "Grandpa"
+        case .other: return "Other caregiver"
+        }
+    }
+    /// How the child hears you in the story.
+    var storyName: String {
+        switch self {
+        case .mom: return "Mommy"
+        case .dad: return "Daddy"
+        case .grandma: return "Grandma"
+        case .grandpa: return "Grandpa"
+        case .other: return "your grown-up"
+        }
+    }
+}
+
 /// Everything collected in onboarding. Saved locally on the device.
 struct OnboardingAnswers: Codable, Equatable {
     var parentName = ""
     var childName = ""
     var ageGroup: AgeGroup = .toddler
+    var relationship: Relationship = .mom
     /// Quiz answers: question id → selected option ids.
     var quiz: [String: [String]] = [:]
     var usualZones: [CareZone] = [.arms, .elbows, .knees]
@@ -62,7 +88,7 @@ struct OnboardingAnswers: Codable, Equatable {
         case "sleep": line = "30 nights from now, you could be sleeping through again."
         case "evenings": line = "30 nights from now, your evenings are yours again."
         case "connection": line = "bedtime is about to become your favorite part of the day."
-        case "confidence": line = "in 30 nights you'll know exactly what to do, every night."
+        case "confidence": line = "30 nights from now, \(displayChild) could feel more at home in their own skin."
         default: line = "30 nights from now, bedtime won't feel like a battle."
         }
         let name = parentName.trimmingCharacters(in: .whitespaces)
@@ -70,7 +96,14 @@ struct OnboardingAnswers: Codable, Equatable {
         return "\(name), \(line)"
     }
 
+    /// Touch-sensitive or touch-averse kids start with shorter rituals.
+    var startsGentle: Bool {
+        let touch = selected("touch").first
+        return touch == "notFan" || touch == "sensitive"
+    }
+
     var recommendedMinutes: Int {
+        if startsGentle { return 5 }
         switch ageGroup {
         case .baby: return 5
         case .toddler: return 10

@@ -178,20 +178,6 @@ struct HowItHelpsScreen: View {
                 TimelineRow(when: "Week 1", text: "Bedtime has a rhythm. \(child) knows what comes next, and starts asking for it.", isLast: false)
                 TimelineRow(when: "Night 30", text: "Lotion time is your calmest moment together, and your evenings are yours again.", isLast: true)
             }
-            HBCard {
-                Text("Backed by research").hbText(.label, color: HBColor.accentCalm)
-                Text("In a clinical study of children with eczema, kids whose parents massaged their cream in for 20 minutes every night for a month improved more in redness, scaling and itching than kids who just had it applied. Parents felt less anxious too.")
-                    .hbText(.body)
-                Text("Schachner, Field et al., Pediatric Dermatology, 1998 (small study, 1 month).")
-                    .hbText(.footnote, color: HBColor.textSecondary)
-            }
-            HBCard {
-                Text("And for sleep").hbText(.label, color: HBColor.accentCalm)
-                Text("In a 2023 randomized trial of 140 babies, a 15-minute bedtime massage every night meant falling asleep faster, fewer night wakings and longer stretches of sleep. Their mothers slept longer too.")
-                    .hbText(.body)
-                Text("Rezaei et al., 2023. Every child is different; these are the goals families work toward.")
-                    .hbText(.footnote, color: HBColor.textSecondary)
-            }
         } footer: {
             Button("I want that for us", action: next).buttonStyle(.hbPrimary)
         }
@@ -271,7 +257,7 @@ struct FeaturesScreen: View {
             FeatureRow(icon: .tonight, title: "\(child) drifts off, screen-free",
                        text: "Calming stories and spa music play while you massage.")
             FeatureRow(icon: .shield, title: "Gentle on flares",
-                       text: "Glide on dry skin, pat on flares, skip broken skin.")
+                       text: "Glide on dry skin, no massage on flares, skip broken skin.")
             FeatureRow(icon: .report, title: "Walk into appointments with proof",
                        text: "A 2-second nightly check-in builds a report for your doctor.")
         } footer: {
@@ -396,7 +382,7 @@ struct PlanScreen: View {
                 PlanLine(label: "Nightly ritual", value: "\(a.recommendedMinutes) minutes")
                 PlanLine(label: "Care areas", value: a.usualZones.map(\.label).joined(separator: ", "))
                 PlanLine(label: "First story", value: StoryLibrary.otter.title)
-                PlanLine(label: "Techniques", value: "Glide for dry skin, pat for flares")
+                PlanLine(label: "Techniques", value: "Glide on dry skin, gentle smoothing on flares")
             }
             HBCard {
                 Text("Your 30-night goal").hbText(.label, color: HBColor.accentWarm)

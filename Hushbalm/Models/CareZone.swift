@@ -3,8 +3,8 @@ import Foundation
 enum CareState: String, Codable {
     case dry, flaring
 
-    var technique: String { self == .dry ? "Glide" : "Pat" }
-    var label: String { self == .dry ? "Dry · glide" : "Flaring · pat" }
+    var technique: String { self == .dry ? "Glide" : "Smooth" }
+    var label: String { self == .dry ? "Dry · glide" : "Flaring · smooth" }
 
     var next: CareState? { self == .dry ? .flaring : nil }
 }
@@ -45,7 +45,7 @@ enum CareZone: String, Codable, CaseIterable, Identifiable {
         }
     }
 
-    static let patScript = "No rubbing here. Press lotion on with a soft, flat palm, hold for one slow breath, then lift. Skip any broken or oozing skin."
+    static let patScript = "No massage on flaring skin (dermatologists advise against it). Just smooth the cream on gently with flat fingers, or apply their prescribed treatment as directed, then move on. Skip broken or oozing skin."
 
     func script(for state: CareState) -> String {
         state == .dry ? glideScript : CareZone.patScript

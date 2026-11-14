@@ -82,10 +82,10 @@ enum MassageLibrary {
                     "Use long, slow strokes in the direction the hair grows.",
                     "Keep pressure light and even. Let the lotion melt in."]),
         MassageTechnique(
-            id: "pat", title: "Gentle patting", detail: "For flaring, itchy skin",
-            steps: ["Never rub flaring skin.",
-                    "Press lotion on with a soft, flat palm.",
-                    "Hold for one slow breath, then lift. Skip broken or oozing skin."]),
+            id: "pat", title: "Flare-gentle smoothing", detail: "For flaring, itchy skin: no massage",
+            steps: ["Don't massage skin that is actively flaring.",
+                    "Smooth the cream on gently with flat fingers, or apply their prescribed treatment as directed.",
+                    "Massage the calm skin around it instead. Skip broken or oozing skin."]),
         MassageTechnique(
             id: "creases", title: "Elbow and knee creases", detail: "The spots kids hate most",
             steps: ["Gently straighten the arm or leg.",
@@ -121,18 +121,19 @@ struct RitualStep: Identifiable, Hashable {
 enum RitualBuilder {
     /// Builds tonight's massage story: one scene per area the parent tapped.
     static func steps(for zones: [CareZone: CareState],
-                      story: MassageStory = MassageStoryLibrary.sleepyComet) -> [RitualStep] {
+                      story: MassageStory = MassageStoryLibrary.sleepyComet,
+                      grownUp: String = "your grown-up") -> [RitualStep] {
         var steps = [RitualStep(
             kind: .warm, title: "Warm the cream", badge: "Get ready",
             script: "Warm a generous amount of moisturizer between your palms. Prescribed cream first, exactly as directed.",
-            narration: story.opening)]
+            narration: MassageStory.personalize(story.opening, grownUp: grownUp))]
         let areas = zones.isEmpty ? [CareZone.arms: CareState.dry, .legs: .dry, .back: .dry] : zones
         for zone in CareZone.allCases {
             guard let state = areas[zone] else { continue }
             steps.append(RitualStep(
                 kind: state == .dry ? .glide : .pat,
                 title: zone.label,
-                badge: state == .dry ? "Glide · dry skin" : "Pat · flaring skin",
+                badge: state == .dry ? "Glide · dry skin" : "Smooth · no massage",
                 script: state == .dry ? zone.glideScript : CareZone.patScript,
                 narration: story.scene(for: zone, state: state)))
         }

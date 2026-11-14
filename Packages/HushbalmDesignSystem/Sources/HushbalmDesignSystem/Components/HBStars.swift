@@ -139,3 +139,33 @@ struct SeededGenerator: RandomNumberGenerator {
         return z ^ (z >> 31)
     }
 }
+
+/// Onboarding progress: a glowing star travels along the track, leaving lit stars behind it.
+public struct HBStarProgress: View {
+    let progress: Double
+    private let markers = 5
+
+    public init(progress: Double) { self.progress = min(max(progress, 0), 1) }
+
+    public var body: some View {
+        GeometryReader { geo in
+            let width = geo.size.width
+            ZStack(alignment: .leading) {
+                Capsule().fill(HBColor.surfaceRaised).frame(height: 8)
+                Capsule().fill(HBColor.accentCalm).frame(width: max(8, width * progress), height: 8)
+                ForEach(1..<markers, id: \.self) { index in
+                    let position = Double(index) / Double(markers)
+                    HBStar(size: 10, isLit: progress >= position)
+                        .position(x: width * position, y: 14)
+                }
+                HBStar(size: 26)
+                    .position(x: min(max(13, width * progress), width - 13), y: 14)
+            }
+        }
+        .frame(height: 28)
+        .animation(.easeInOut(duration: 0.35), value: progress)
+        .accessibilityElement()
+        .accessibilityLabel("Progress")
+        .accessibilityValue("\(Int(progress * 100)) percent")
+    }
+}
