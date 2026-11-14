@@ -49,8 +49,8 @@ struct RootView: View {
 private struct LaunchView: View {
     var body: some View {
         ZStack {
-            HBColor.background.ignoresSafeArea()
-            Image(hb: .tonight).hbIcon(44, color: HBColor.accentWarm)
+            StarryBackground()
+            HBStar(size: 56)
         }
     }
 }

@@ -2,7 +2,7 @@ import Foundation
 
 /// Everything you need to change before submitting to the App Store lives here.
 enum AppConfig {
-    static let appName = "Hushbalm" // TODO: final app name
+    static let appName = "Alji"
 
     // MARK: Subscriptions (must match App Store Connect and Products.storekit)
     // Pricing follows the category leaders: annual plan with a 7-day free trial (Storybook's
@@ -29,9 +29,11 @@ enum AppConfig {
     // MARK: Founder story (social proof screen)
     // TODO: write this in your own words. Keep it true.
     static let founderName = "Hannah"
+    // TODO: rewrite in your own words. Draft based on your story.
     static let founderNote = """
-    I've had eczema my whole life. I know how tedious lotion is, and how long the nights get when the itch won't stop. \
-    I built this so bedtime can be the calmest part of your family's day, not the hardest.
+    I grew up with eczema. Every night my mom massaged my cream in and tucked me in under the glow-in-the-dark \
+    stars on my ceiling. The itch didn't always go away, but bedtime felt safe. Alji is that ritual, \
+    for every family living with eczema.
     """
 
     // MARK: Reviews
@@ -41,7 +43,7 @@ enum AppConfig {
     static let testimonials: [Testimonial] = []
 
     static let medicalDisclaimer = """
-    Hushbalm is a bedtime routine guide, not medical care. It does not diagnose or treat eczema. \
+    Alji is a bedtime routine guide, not medical care. It does not diagnose or treat eczema. \
     Follow your doctor's treatment plan and skip broken, oozing or infected skin.
     """
 }

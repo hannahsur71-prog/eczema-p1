@@ -25,6 +25,7 @@ struct ReportView: View {
                                 .hbText(.body, color: HBColor.textSecondary)
                         }
                     } else {
+                        ceiling
                         stats
                         chart
                         notes
@@ -38,6 +39,15 @@ struct ReportView: View {
             .background(HBColor.background.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $showUpgrade) { PaywallView(context: .upgrade) }
+        }
+    }
+
+    /// One glow star for every night logged, like stickers going up on the ceiling.
+    private var ceiling: some View {
+        HBCard {
+            HBSectionHeader("Your ceiling", trailing: "\(min(logs.count, 30)) of 30 nights")
+            HBStarCeiling(total: 30, lit: logs.count)
+            Text("Every night you log lights a star.").hbText(.footnote, color: HBColor.textSecondary)
         }
     }
 

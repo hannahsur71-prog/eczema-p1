@@ -69,7 +69,7 @@ struct TonightView: View {
                 .padding(.horizontal, HBSpacing.screenGutter)
                 .padding(.vertical, HBSpacing.lg)
             }
-            .background(HBColor.background.ignoresSafeArea())
+            .background(StarryBackground(opacity: 0.3, seed: 19))
             .toolbar(.hidden, for: .navigationBar)
             .fullScreenCover(isPresented: $showRitual) {
                 RitualPlayerView(

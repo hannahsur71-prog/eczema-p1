@@ -54,7 +54,7 @@ struct PaywallView: View {
             }
             footer
         }
-        .background(HBColor.background.ignoresSafeArea())
+        .background(StarryBackground(opacity: 0.35, seed: 11))
         .task { if !store.hasLoaded { await store.load() } }
         .fullScreenCover(isPresented: $showOffer) {
             SecondOfferView(isPresented: $showOffer, onDecline: declineEverything)
@@ -302,7 +302,7 @@ struct SecondOfferView: View {
             .padding(.horizontal, HBSpacing.screenGutter)
             .padding(.vertical, HBSpacing.sm)
         }
-        .background(HBColor.background.ignoresSafeArea())
+        .background(StarryBackground(opacity: 0.35, seed: 23))
     }
 
     private func decline() {
@@ -397,11 +397,9 @@ struct WelcomeAfterPurchaseView: View {
         let a = appState.answers
         OnboardingScaffold {
             Spacer(minLength: HBSpacing.xl)
-            Image(hb: .heart)
-                .hbIcon(36, color: HBColor.accentWarm)
-                .frame(width: 80, height: 80)
+            HBStar(size: 56)
+                .frame(width: 88, height: 88)
                 .background(HBColor.surface, in: Circle())
-                .accessibilityHidden(true)
             HBScreenHeader(title: "Welcome, \(a.displayParent == "You" ? "friend" : a.displayParent).",
                            subtitle: welcomeLine(a), isHero: true)
             if let end = store.trialEndDate, let yearly = store.yearly {
@@ -418,7 +416,7 @@ struct WelcomeAfterPurchaseView: View {
         } footer: {
             Button("Go to tonight") { appState.showWelcomeAfterPurchase = false }.buttonStyle(.hbPrimary)
         }
-        .background(HBColor.background.ignoresSafeArea())
+        .background(StarryBackground())
     }
 
     private func welcomeLine(_ a: OnboardingAnswers) -> String {

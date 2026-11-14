@@ -9,11 +9,9 @@ struct WelcomeScreen: View {
     var body: some View {
         OnboardingScaffold {
             Spacer(minLength: HBSpacing.xl)
-            Image(hb: .tonight)
-                .hbIcon(44, color: HBColor.accentWarm)
-                .frame(width: 88, height: 88)
+            HBStar(size: 64)
+                .frame(width: 96, height: 96)
                 .background(HBColor.surface, in: Circle())
-                .accessibilityHidden(true)
             HBScreenHeader(
                 title: "Bedtime can be the calmest part of your day.",
                 subtitle: "A gentle massage-and-story ritual that turns lotion time into the moment your child looks forward to. No screen for them, ever.",

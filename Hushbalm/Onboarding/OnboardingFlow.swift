@@ -41,7 +41,7 @@ struct OnboardingFlow: View {
                     removal: .move(edge: movingForward ? .leading : .trailing).combined(with: .opacity)))
         }
         .animation(.easeInOut(duration: 0.3), value: index)
-        .background(HBColor.background.ignoresSafeArea())
+        .background(StarryBackground())
     }
 
     private var topBar: some View {
@@ -116,5 +116,19 @@ struct OnboardingScaffold<Content: View, Footer: View>: View {
                 .padding(.bottom, HBSpacing.md)
                 .background(HBColor.background)
         }
+    }
+}
+
+/// The night-sky background with glow-sticker stars, used across Alji.
+struct StarryBackground: View {
+    var opacity: Double = 0.45
+    var seed: UInt64 = 7
+
+    var body: some View {
+        ZStack {
+            HBColor.background
+            HBStarField(count: 16, seed: seed, opacity: opacity)
+        }
+        .ignoresSafeArea()
     }
 }

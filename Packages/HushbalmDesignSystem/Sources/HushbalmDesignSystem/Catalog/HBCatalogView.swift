@@ -15,6 +15,7 @@ public struct HBCatalogView: View {
                 HBScreenHeader(eyebrow: "Design system", title: "Hushbalm",
                                subtitle: "One font family, one palette, one set of components.", isHero: true)
 
+                stars
                 colors
                 typography
                 buttons
@@ -29,6 +30,23 @@ public struct HBCatalogView: View {
     }
 
     // MARK: Sections
+
+    private var stars: some View {
+        VStack(alignment: .leading, spacing: HBSpacing.sm) {
+            HBSectionHeader("Stars", trailing: "Glow-sticker motif")
+            HStack(spacing: HBSpacing.md) {
+                HBStar(size: 32)
+                HBStar(size: 24)
+                HBStar(size: 32, isLit: false)
+            }
+            HBStarCeiling(total: 12, lit: 7)
+            ZStack {
+                RoundedRectangle(cornerRadius: HBRadius.xl, style: .continuous).fill(HBColor.background)
+                HBStarField(count: 10, seed: 2)
+            }
+            .frame(height: 120)
+        }
+    }
 
     private var colors: some View {
         VStack(alignment: .leading, spacing: HBSpacing.sm) {

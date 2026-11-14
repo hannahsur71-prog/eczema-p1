@@ -17,7 +17,7 @@ struct RitualPlayerView: View {
 
     var body: some View {
         ZStack {
-            HBColor.background.ignoresSafeArea()
+            StarryBackground(opacity: 0.3, seed: 5)
             switch engine.phase {
             case .massage: massage
             case .story, .finished: afterMassage
@@ -84,11 +84,9 @@ struct RitualPlayerView: View {
     private var afterMassage: some View {
         VStack(spacing: HBSpacing.lg) {
             Spacer()
-            Image(hb: .tonight)
-                .hbIcon(48, color: HBColor.accentWarm)
+            HBStar(size: 64)
                 .frame(width: 100, height: 100)
                 .background(HBColor.surface, in: Circle())
-                .accessibilityHidden(true)
             HBScreenHeader(
                 title: engine.phase == .story ? "Massage done." : "Sweet dreams.",
                 subtitle: engine.phase == .story
@@ -108,6 +106,8 @@ struct RitualPlayerView: View {
         Button { dimmed = false } label: {
             ZStack(alignment: .bottom) {
                 HBColor.dimmed.ignoresSafeArea()
+                // Like glow stickers on the ceiling after lights out: barely there.
+                HBStarField(count: 12, seed: 3, opacity: 0.12).ignoresSafeArea()
                 VStack(spacing: HBSpacing.xxs) {
                     Text(engine.phase == .massage ? "Now: \(engine.currentStep.title)" : "Story playing")
                         .hbText(.callout, color: HBColor.textDimmed)
