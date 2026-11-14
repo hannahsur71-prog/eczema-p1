@@ -44,10 +44,30 @@ public enum HBIcon: String, CaseIterable {
     case info = "info.circle"
     case dim = "moon.zzz"
     case share = "square.and.arrow.up"
+    case settings = "gearshape"
+    case close = "xmark"
+    case bell = "bell"
+    case heart = "heart.fill"
+    case star = "star.fill"
+    case sparkles = "sparkles"
+    case hands = "hands.and.sparkles"
+    case play = "play.fill"
+    case pause = "pause.fill"
+    case forward = "forward.end.fill"
+    case shield = "checkmark.shield"
 }
 
 public extension Image {
     init(hb icon: HBIcon) {
         self.init(systemName: icon.rawValue)
+    }
+}
+
+public extension View {
+    /// Sizes and colors an SF Symbol the design-system way. Use instead of `.font(...)` on icons.
+    func hbIcon(_ size: CGFloat = HBSize.iconSmall, color: Color = HBColor.textPrimary) -> some View {
+        self
+            .font(.system(size: size, weight: .semibold, design: .rounded))
+            .foregroundStyle(color)
     }
 }
