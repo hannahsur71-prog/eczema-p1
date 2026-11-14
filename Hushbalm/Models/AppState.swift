@@ -23,6 +23,7 @@ final class AppState {
     var tonightZones: [CareZone: CareState] { didSet { saveTonight() } }
     var tonightMinutes: Int = 10
     var tonightStoryID: String = StoryLibrary.otter.id
+    var tonightMassageStoryID: String = MassageStoryLibrary.sleepyComet.id
 
     init() {
         let defaults = UserDefaults.standard

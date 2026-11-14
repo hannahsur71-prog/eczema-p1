@@ -21,7 +21,8 @@ struct TasteRitualScreen: View {
                     HBSegmentedProgress(total: engine.steps.count, current: engine.index, fraction: engine.stepFraction)
                     HBBadge(engine.currentStep.badge, tone: engine.currentStep.kind == .pat ? .warm : .calm)
                     Text(engine.currentStep.title).hbText(.title2)
-                    Text(engine.currentStep.script).hbText(.body, color: HBColor.textSecondary)
+                    Text(engine.currentStep.script).hbText(.body)
+                    Text("“\(engine.currentStep.narration)”").hbText(.footnote, color: HBColor.textSecondary)
                 }
             } else {
                 HBCard {
@@ -51,7 +52,7 @@ struct TasteRitualScreen: View {
 
     private func start() {
         let zone = firstZone
-        let steps = RitualBuilder.steps(for: [zone: .dry])
+        let steps = RitualBuilder.steps(for: [zone: .dry], story: MassageStoryLibrary.sleepyComet)
         let ritual = RitualEngine(steps: steps, story: StoryLibrary.otter, minutes: 1,
                                   includesStory: false, stepSecondsOverride: 20)
         engine = ritual

@@ -95,7 +95,7 @@ final class RitualEngine {
 
     private func speakCurrentStep() {
         guard voiceOn else { return }
-        speech.speak([currentStep.title + ". " + currentStep.script], rate: 0.42, onFinish: nil)
+        speech.speak([currentStep.narration], rate: 0.42, onFinish: nil)
     }
 
     private func beginStory() {

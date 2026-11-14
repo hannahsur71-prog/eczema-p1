@@ -51,7 +51,19 @@ struct TonightView: View {
                     }
 
                     VStack(alignment: .leading, spacing: HBSpacing.sm) {
-                        HBSectionHeader("Tonight's story")
+                        HBSectionHeader("Lumi's massage story", trailing: "Guides your hands")
+                        ForEach(MassageStoryLibrary.all) { story in
+                            let locked = !isPremium && story.id != MassageStoryLibrary.sleepyComet.id
+                            HBRadioRow(title: story.title,
+                                       subtitle: (locked ? "Premium · " : "") + "\(story.ages) · \(story.blurb)",
+                                       isSelected: effectiveMassageStoryID == story.id) {
+                                if locked { showUpgrade = true } else { appState.tonightMassageStoryID = story.id }
+                            }
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: HBSpacing.sm) {
+                        HBSectionHeader("Drift-off story", trailing: "Plays after the massage")
                         ForEach(StoryLibrary.all) { story in
                             let locked = !isPremium && story.id != StoryLibrary.otter.id
                             HBRadioRow(title: story.title, subtitle: locked ? "Premium · \(story.blurb)" : story.blurb,
@@ -73,7 +85,8 @@ struct TonightView: View {
             .toolbar(.hidden, for: .navigationBar)
             .fullScreenCover(isPresented: $showRitual) {
                 RitualPlayerView(
-                    steps: RitualBuilder.steps(for: appState.tonightZones),
+                    steps: RitualBuilder.steps(for: appState.tonightZones,
+                                               story: MassageStoryLibrary.story(effectiveMassageStoryID)),
                     story: StoryLibrary.story(effectiveStoryID),
                     minutes: effectiveMinutes)
             }
@@ -83,6 +96,9 @@ struct TonightView: View {
     }
 
     private var effectiveMinutes: Int { isPremium ? appState.tonightMinutes : 5 }
+    private var effectiveMassageStoryID: String {
+        isPremium ? appState.tonightMassageStoryID : MassageStoryLibrary.sleepyComet.id
+    }
     private var effectiveStoryID: String { isPremium ? appState.tonightStoryID : StoryLibrary.otter.id }
 
     private var greeting: String {

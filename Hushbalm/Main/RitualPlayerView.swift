@@ -52,6 +52,10 @@ struct RitualPlayerView: View {
                 Text(step.title).hbText(.title).multilineTextAlignment(.center)
                 StepIllustration(kind: step.kind)
                 Text(step.script).hbText(.body).multilineTextAlignment(.center)
+                Text("“\(step.narration)”")
+                    .hbText(.footnote, color: HBColor.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(4)
                 Text("\(timeText(engine.remaining)) left in this step")
                     .hbText(.footnote, color: HBColor.textSecondary)
             }

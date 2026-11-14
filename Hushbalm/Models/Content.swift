@@ -104,32 +104,42 @@ enum MassageLibrary {
     ]
 }
 
-/// One step of tonight's ritual.
+/// One scene of tonight's ritual.
 struct RitualStep: Identifiable, Hashable {
     enum Kind: Hashable { case warm, glide, pat, calm }
     let id = UUID()
     let kind: Kind
+    /// Body area or moment, shown to the parent.
     let title: String
     let badge: String
+    /// Short instruction for the parent's hands, shown on screen.
     let script: String
+    /// The story the child hears. Spoken aloud.
+    let narration: String
 }
 
 enum RitualBuilder {
-    static func steps(for zones: [CareZone: CareState]) -> [RitualStep] {
+    /// Builds tonight's massage story: one scene per area the parent tapped.
+    static func steps(for zones: [CareZone: CareState],
+                      story: MassageStory = MassageStoryLibrary.sleepyComet) -> [RitualStep] {
         var steps = [RitualStep(
-            kind: .warm, title: "Warm the lotion", badge: "Get ready",
-            script: "Squeeze a generous amount of moisturizer into your palms and rub them together so it isn't cold. If the doctor prescribed a cream, apply it first, exactly as directed.")]
+            kind: .warm, title: "Warm the cream", badge: "Get ready",
+            script: "Warm a generous amount of moisturizer between your palms. Prescribed cream first, exactly as directed.",
+            narration: story.opening)]
+        let areas = zones.isEmpty ? [CareZone.arms: CareState.dry, .legs: .dry, .back: .dry] : zones
         for zone in CareZone.allCases {
-            guard let state = zones[zone] else { continue }
+            guard let state = areas[zone] else { continue }
             steps.append(RitualStep(
                 kind: state == .dry ? .glide : .pat,
                 title: zone.label,
                 badge: state == .dry ? "Glide · dry skin" : "Pat · flaring skin",
-                script: zone.script(for: state)))
+                script: state == .dry ? zone.glideScript : CareZone.patScript,
+                narration: story.scene(for: zone, state: state)))
         }
         steps.append(RitualStep(
             kind: .calm, title: "Slow back circles", badge: "Wind down",
-            script: "Rest your hand on their back and make big, slow circles. Match your breathing to the music. The story will begin now."))
+            script: "Big, slow circles on their back. Match your breathing to the music.",
+            narration: story.closing + " Now, let's whisper together: " + story.affirmation))
         return steps
     }
 }
