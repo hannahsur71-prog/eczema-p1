@@ -7,6 +7,8 @@ struct HushbalmApp: App {
     @State private var appState = AppState()
     @State private var store = StoreManager()
 
+    init() { HBFonts.register() }
+
     var body: some Scene {
         WindowGroup {
             RootView()

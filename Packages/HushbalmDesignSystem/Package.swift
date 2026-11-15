@@ -8,6 +8,10 @@ let package = Package(
         .library(name: "HushbalmDesignSystem", targets: ["HushbalmDesignSystem"])
     ],
     targets: [
-        .target(name: "HushbalmDesignSystem", path: "Sources/HushbalmDesignSystem")
+        .target(
+            name: "HushbalmDesignSystem",
+            path: "Sources/HushbalmDesignSystem",
+            resources: [.process("Resources")]
+        )
     ]
 )

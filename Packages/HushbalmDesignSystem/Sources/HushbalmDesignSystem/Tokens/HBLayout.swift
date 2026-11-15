@@ -16,16 +16,21 @@ public enum HBSpacing {
 /// Corner radii. Continuous ("squircle") corners everywhere.
 public enum HBRadius {
     public static let sm: CGFloat = 12   // toggles, small controls
-    public static let md: CGFloat = 16   // chips in grids, inputs, notices
-    public static let lg: CGFloat = 18   // buttons, rows
-    public static let xl: CGFloat = 24   // cards
+    public static let button: CGFloat = 14   // primary and secondary buttons, text fields
+    public static let md: CGFloat = 16   // answer options, chips, notices
+    public static let lg: CGFloat = 18   // rows, plan cards
+    public static let xl: CGFloat = 20   // cards
 }
 
 /// Fixed control sizes.
 public enum HBSize {
     /// Apple's minimum touch target.
     public static let minTouch: CGFloat = 44
-    public static let buttonHeight: CGFloat = 56
+    public static let buttonHeight: CGFloat = 60
+    /// Answer option rows (single column).
+    public static let optionMinHeight: CGFloat = 62
+    /// Answer options in a two-column grid.
+    public static let optionGridMinHeight: CGFloat = 54
     public static let rowMinHeight: CGFloat = 64
     public static let iconSmall: CGFloat = 18
     public static let iconMedium: CGFloat = 22
@@ -67,7 +72,7 @@ public extension View {
     /// Sizes and colors an SF Symbol the design-system way. Use instead of `.font(...)` on icons.
     func hbIcon(_ size: CGFloat = HBSize.iconSmall, color: Color = HBColor.textPrimary) -> some View {
         self
-            .font(.system(size: size, weight: .semibold, design: .rounded))
+            .font(.system(size: size, weight: .semibold))
             .foregroundStyle(color)
     }
 }

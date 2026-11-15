@@ -18,7 +18,7 @@ Pick an iPhone simulator and press Run. Purchases work locally through `Hushbalm
 
 ## How the app is laid out
 ```
-Packages/HushbalmDesignSystem   Design system: one font (SF Pro Rounded, 8 styles), colors, spacing, components
+Packages/HushbalmDesignSystem   Design system: one font (Figtree, 12 styles), colors, spacing, onboarding and paywall parts
 Hushbalm/App                    App entry + root flow
 Hushbalm/Onboarding             The funnel (the most important part of the app)
 Hushbalm/Paywall                Paywall, second offer, welcome-after-purchase

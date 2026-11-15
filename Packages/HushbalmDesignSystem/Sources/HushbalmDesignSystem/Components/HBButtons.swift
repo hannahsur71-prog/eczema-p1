@@ -1,9 +1,9 @@
 import SwiftUI
 
 /// Full-width buttons. Three kinds only.
-/// - primary: one per screen, the main action (warm lotion fill).
-/// - secondary: alternative actions (raised surface).
-/// - ghost: low-emphasis actions like "Skip tonight" (text only).
+/// - primary: one per screen, the main action (sky blue fill).
+/// - secondary: alternative actions (outlined).
+/// - ghost: low-emphasis actions like "Skip for now" (underlined text only).
 public struct HBButtonStyle: ButtonStyle {
     public enum Kind { case primary, secondary, ghost }
 
@@ -15,9 +15,14 @@ public struct HBButtonStyle: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .hbText(kind == .primary ? .headline : .callout, color: foreground)
-            .frame(maxWidth: .infinity, minHeight: HBSize.buttonHeight)
+            .underline(kind == .ghost)
+            .frame(maxWidth: .infinity, minHeight: kind == .ghost ? HBSize.minTouch : HBSize.buttonHeight)
             .padding(.horizontal, HBSpacing.md)
-            .background(background, in: RoundedRectangle(cornerRadius: HBRadius.lg, style: .continuous))
+            .background(background, in: RoundedRectangle(cornerRadius: HBRadius.button, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: HBRadius.button, style: .continuous)
+                    .strokeBorder(kind == .secondary ? HBColor.borderQuiet : Color.clear, lineWidth: 1.5)
+            )
             .opacity(configuration.isPressed ? 0.8 : 1)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
@@ -25,20 +30,17 @@ public struct HBButtonStyle: ButtonStyle {
     }
 
     private var foreground: Color {
-        guard isEnabled else { return HBColor.textSecondary }
         switch kind {
-        case .primary: return HBColor.onAccent
-        case .secondary: return HBColor.textPrimary
-        case .ghost: return HBColor.textSecondary
+        case .primary: return isEnabled ? HBColor.onAction : HBColor.onActionDisabled
+        case .secondary: return isEnabled ? HBColor.textPrimary : HBColor.textTertiary
+        case .ghost: return isEnabled ? HBColor.textPrimary : HBColor.textTertiary
         }
     }
 
     private var background: Color {
-        guard isEnabled else { return kind == .ghost ? .clear : HBColor.surfaceRaised }
         switch kind {
-        case .primary: return HBColor.accentWarm
-        case .secondary: return HBColor.surfaceRaised
-        case .ghost: return .clear
+        case .primary: return isEnabled ? HBColor.action : HBColor.actionDisabled
+        case .secondary, .ghost: return .clear
         }
     }
 }
@@ -64,10 +66,10 @@ public struct HBIconButton: View {
     public var body: some View {
         Button(action: action) {
             Image(hb: icon)
-                .font(.system(size: HBSize.iconSmall, weight: .semibold, design: .rounded))
+                .font(.system(size: HBSize.iconSmall, weight: .semibold))
                 .foregroundStyle(HBColor.textPrimary)
                 .frame(width: HBSize.minTouch, height: HBSize.minTouch)
-                .background(HBColor.surface, in: RoundedRectangle(cornerRadius: HBRadius.sm, style: .continuous))
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(accessibilityLabel)

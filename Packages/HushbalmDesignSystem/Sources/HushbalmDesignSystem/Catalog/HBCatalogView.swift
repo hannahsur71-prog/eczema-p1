@@ -7,7 +7,12 @@ public struct HBCatalogView: View {
     @State private var tileTone: HBStatusTile.Tone = .calm
     @State private var selectedStory = 0
 
-    public init() {}
+    @State private var demoAnswer = 1
+    @State private var demoName = ""
+    @State private var demoPlan = 0
+    @State private var demoChecked = true
+
+    public init() { HBFonts.register() }
 
     public var body: some View {
         ScrollView {
@@ -19,6 +24,8 @@ public struct HBCatalogView: View {
                 colors
                 typography
                 buttons
+                onboarding
+                paywall
                 selection
                 containers
             }
@@ -69,13 +76,50 @@ public struct HBCatalogView: View {
 
     private var typography: some View {
         VStack(alignment: .leading, spacing: HBSpacing.sm) {
-            HBSectionHeader("Type · SF Pro Rounded", trailing: "Scales with Dynamic Type")
+            HBSectionHeader("Type · Figtree", trailing: "Scales with Dynamic Type")
             ForEach(HBTextStyle.allCases, id: \.self) { style in
                 VStack(alignment: .leading, spacing: 2) {
                     Text(style.name).hbText(.label, color: HBColor.textSecondary)
-                    Text("Warm the lotion in your hands").hbText(style)
+                    Text("Warm the cream in your hands").hbText(style)
                 }
             }
+        }
+    }
+
+    private var onboarding: some View {
+        VStack(alignment: .leading, spacing: HBSpacing.sm) {
+            HBSectionHeader("Onboarding")
+            HBProgressBar(progress: 0.4)
+            HBHighlightedTitle("How warm is *Maya's* room at night?")
+            HBOptionRow("Cool", isSelected: demoAnswer == 0) { demoAnswer = 0 }
+            HBOptionRow("Warm or stuffy", isSelected: demoAnswer == 1) { demoAnswer = 1 }
+            HBFeedbackNote("Worth changing: heat and sweat are common itch triggers.")
+            HBTextField("Name or nickname", text: $demoName)
+            HBStat(value: "7 in 10", caption: "children with eczema have disrupted sleep.")
+            HBSourceNote("Eczema Society of Canada caregiver survey.")
+            HBComparisonBars(eyebrow: "Time to fall asleep", nowValue: "70 min",
+                             goalLabel: "Goal with a nightly ritual", goalValue: "15 min", goalFraction: 15.0 / 70.0)
+            HBResultCard(value: "−55 min", caption: "a night, back for you both.")
+            HBTimelineRow(time: "7:08", title: "Massage story", detail: "10 min · moisturizer on damp skin", icon: .sparkles)
+            HBTimelineRow(time: "7:30", title: "Asleep", detail: "Log tonight in 2 seconds", icon: .dim, tint: HBColor.accentCalm, isLast: true)
+            HBChecklistRow("Lights dimmed", detail: "Warm lamps only", isDone: demoChecked) { demoChecked.toggle() }
+        }
+    }
+
+    private var paywall: some View {
+        VStack(alignment: .leading, spacing: HBSpacing.sm) {
+            HBSectionHeader("Paywall")
+            HBBenefitRow("Massage stories that guide your hands")
+            HBBenefitRow("Bedtime stories and affirmations, screen-free")
+            HBPlanCard(title: "Yearly", price: "$59.99 a year · $5 a month", badge: "3 days free", isSelected: demoPlan == 0) { demoPlan = 0 }
+            HBPlanCard(title: "Monthly", price: "$9.99 a month", isSelected: demoPlan == 1) { demoPlan = 1 }
+            HBTrialSteps([
+                HBTrialStep(title: "Full access", when: "Today", icon: .sparkles, tint: HBColor.accentWarm),
+                HBTrialStep(title: "We remind you", when: "Day 2", icon: .bell, tint: HBColor.accentCalm),
+                HBTrialStep(title: "Billing starts", when: "Day 3", icon: .check, tint: HBColor.action)
+            ])
+            Button("Start my 3-day free trial") {}.buttonStyle(.hbPrimary)
+            Button("Skip for now") {}.buttonStyle(.hbGhost)
         }
     }
 
@@ -156,7 +200,11 @@ private struct Swatch: Identifiable {
         Swatch(name: "textPrimary", color: HBColor.textPrimary),
         Swatch(name: "textSecondary", color: HBColor.textSecondary),
         Swatch(name: "accentCalm", color: HBColor.accentCalm),
-        Swatch(name: "accentWarm", color: HBColor.accentWarm)
+        Swatch(name: "accentWarm", color: HBColor.accentWarm),
+        Swatch(name: "action", color: HBColor.action),
+        Swatch(name: "surfaceDeep", color: HBColor.surfaceDeep),
+        Swatch(name: "textTertiary", color: HBColor.textTertiary),
+        Swatch(name: "coral", color: HBColor.coral)
     ]
 }
 

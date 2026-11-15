@@ -70,7 +70,7 @@ public struct HBNotice: View {
     public var body: some View {
         HStack(alignment: .top, spacing: HBSpacing.sm) {
             Image(hb: .info)
-                .font(.system(size: HBSize.iconSmall, weight: .semibold, design: .rounded))
+                .font(.system(size: HBSize.iconSmall, weight: .semibold))
                 .foregroundStyle(HBColor.accentWarm)
                 .accessibilityHidden(true)
             Text(text).hbText(.footnote, color: HBColor.textSecondary)
