@@ -39,7 +39,7 @@ enum QuizBank {
         ),
         QuizQuestion(
             id: "lotionTime",
-            title: "What usually happens at lotion time?",
+            title: "What usually happens at cream time?",
             subtitle: nil,
             options: [
                 QuizOption(id: "fine", title: "It goes fine", weight: 0),

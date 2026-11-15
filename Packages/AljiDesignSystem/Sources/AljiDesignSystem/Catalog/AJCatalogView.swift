@@ -11,6 +11,9 @@ public struct AJCatalogView: View {
     @State private var demoName = ""
     @State private var demoPlan = 0
     @State private var demoChecked = true
+    @State private var demoChip = 0
+    @State private var demoSwitch = true
+    @State private var demoShort = true
 
     public init() { AJFonts.register() }
 
@@ -26,6 +29,7 @@ public struct AJCatalogView: View {
                 buttons
                 onboarding
                 paywall
+                mainApp
                 selection
                 containers
             }
@@ -120,6 +124,32 @@ public struct AJCatalogView: View {
             ])
             Button("Start my 3-day free trial") {}.buttonStyle(.ajPrimary)
             Button("Skip for now") {}.buttonStyle(.ajGhost)
+        }
+    }
+
+    private var mainApp: some View {
+        VStack(alignment: .leading, spacing: AJSpacing.sm) {
+            AJSectionHeader("Main app")
+            HStack(spacing: AJSpacing.md) {
+                AJMoon(size: 90)
+                AJMoon(size: 40, color: AJColor.coral)
+                AJMoon(size: 40, color: Color.white.opacity(0.15))
+            }
+            HStack(spacing: AJSpacing.xs) {
+                AJChoiceChip("Calm", isSelected: demoChip == 0) { demoChip = 0 }
+                AJChoiceChip("A bit itchy", isSelected: demoChip == 1) { demoChip = 1 }
+            }
+            Button("Tonight's plan") {}.buttonStyle(.ajOutline)
+            AJStoryCard(title: "Lumi and the Sleepy Comet", meta: "10 or 20 min · 1+", color: Color(hex: 0x7E63B8), isWide: true) {}
+            AJStoryCard(title: "You Are Loved", meta: "5 min · 2+", color: Color(hex: 0xB98A4A), isWide: false) {}
+            AJSegmentedPicker("Massage length", options: [(value: false, label: "Full · 19 min"), (value: true, label: "Shorter · 8 min")],
+                              selection: $demoShort)
+            AJSheetHeader("How's *Maya's* skin tonight?") {}
+            AJSwitchRow("Sleepy music", detail: "Soft and slow, under the story", isOn: $demoSwitch)
+            AJProgressTrack(progress: 0.4)
+            AJFactCard(eyebrow: "Why it helps",
+                       text: "Children massaged for 20 minutes each night with their moisturizer had less eczema than children who got moisturizer alone.",
+                       source: "Schachner, Field et al., Pediatric Dermatology, 1998")
         }
     }
 

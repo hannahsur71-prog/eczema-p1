@@ -276,7 +276,6 @@ struct OnboardingFlow: View {
         answers.reminderHour = parts.hour
         answers.reminderMinute = parts.minute
         appState.answers = answers
-        appState.seedTonightFromOnboarding()
         if !store.isSubscribed { appState.paywallDismissed = true }
         appState.hasCompletedOnboarding = true
     }

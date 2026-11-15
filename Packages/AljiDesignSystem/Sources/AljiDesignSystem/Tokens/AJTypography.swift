@@ -160,3 +160,10 @@ public extension View {
         modifier(AJTextModifier(style: style, color: color))
     }
 }
+
+public extension Text {
+    /// For text drawn inside a `Canvas`, where view modifiers like `.ajText` can't be used.
+    func ajCanvasText(_ style: AJTextStyle, color: Color = AJColor.textPrimary) -> Text {
+        font(style.font).foregroundStyle(color)
+    }
+}

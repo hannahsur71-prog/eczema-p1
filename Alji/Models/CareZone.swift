@@ -32,16 +32,16 @@ enum CareZone: String, Codable, CaseIterable, Identifiable {
     /// Voice cue for dry skin.
     var glideScript: String {
         switch self {
-        case .face: return "With one fingertip, sweep lotion gently across the cheeks and forehead, away from the eyes. Light as a feather."
-        case .neck: return "Smooth lotion down the neck in soft, downward strokes. Slow and light."
-        case .arms: return "Long, slow strokes from shoulder to wrist, in the direction the hair grows. Let the lotion melt in."
-        case .elbows: return "Gently straighten the arm and glide lotion into the elbow crease with your fingertips."
-        case .hands: return "Hold their hand in yours and glide lotion from the wrist to each fingertip."
+        case .face: return "With one fingertip, sweep cream gently across the cheeks and forehead, away from the eyes. Light as a feather."
+        case .neck: return "Smooth cream down the neck in soft, downward strokes. Slow and light."
+        case .arms: return "Long, slow strokes from shoulder to wrist, in the direction the hair grows. Let the cream melt in."
+        case .elbows: return "Gently straighten the arm and glide cream into the elbow crease with your fingertips."
+        case .hands: return "Hold their hand in yours and glide cream from the wrist to each fingertip."
         case .tummy: return "Rest your palms on the tummy and sweep slowly outward, like opening a book."
         case .back: return "Long strokes from the shoulders down to the waist, one hand after the other."
         case .legs: return "Long, slow strokes from hip to ankle, in the direction the hair grows."
-        case .knees: return "Gently straighten the leg and glide lotion into the back of the knee."
-        case .feet: return "Hold the foot and glide lotion from heel to toes with your thumbs."
+        case .knees: return "Gently straighten the leg and glide cream into the back of the knee."
+        case .feet: return "Hold the foot and glide cream from heel to toes with your thumbs."
         }
     }
 

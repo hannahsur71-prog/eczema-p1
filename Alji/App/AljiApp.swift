@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftData
 import AljiDesignSystem
 
 @main
@@ -17,7 +16,6 @@ struct AljiApp: App {
                 .preferredColorScheme(.dark)
                 .tint(AJColor.accentCalm)
         }
-        .modelContainer(for: NightLog.self)
     }
 }
 

@@ -71,6 +71,17 @@ public enum AJIcon: String, CaseIterable {
     case plus = "plus"
     case apple = "apple.logo"
     case arrowDown = "arrow.down"
+    case home = "house.fill"
+    case stories = "book.fill"
+    case progress = "chart.bar.fill"
+    case chevronDown = "chevron.down"
+    case heartOutline = "heart"
+    case previous = "backward.end.fill"
+    case timer = "timer"
+    case text = "text.alignleft"
+    case hourglass = "hourglass"
+    case pencil = "pencil.and.outline"
+    case speaker = "speaker.wave.2"
 }
 
 public extension Image {

@@ -3,8 +3,8 @@ import StoreKit
 import AljiDesignSystem
 
 /// The paywall.
-/// - Headline remembers the goal they picked in the quiz ("…lotion time without the fight starts tonight").
-/// - Yearly is preselected, shown per month, with a 7-day free trial; monthly has no trial.
+/// - Headline remembers the goal they picked in the quiz ("…cream time without the fight starts tonight").
+/// - Yearly is preselected, shown per month, with a 3-day free trial; monthly has no trial.
 /// - An honest timeline names the real price and the real charge date. The trial reminder is ON.
 /// - Visible close (unless AppConfig.paywallIsHard). Saying no opens a second, cheaper offer,
 ///   then the free version. No fake timers, no invented reviews.
@@ -40,7 +40,7 @@ struct PaywallView: View {
                     plans
 
                     if trialApplies, let yearly = store.yearly {
-                        TrialTimeline(price: yearly.displayPrice, trialDays: yearly.trialDays ?? 7)
+                        TrialTimeline(price: yearly.displayPrice, trialDays: yearly.trialDays ?? 3)
                     } else {
                         VStack(alignment: .leading, spacing: AJSpacing.sm) {
                             AJBenefitRow("Every ritual, story and technique")
@@ -116,7 +116,7 @@ struct PaywallView: View {
                 if store.isPurchasing {
                     ProgressView().tint(AJColor.onAccent)
                 } else {
-                    Text(trialApplies ? "Start \(appState.answers.displayChild)'s free week" : "Start \(appState.answers.displayChild)'s calmer bedtimes")
+                    Text(trialApplies ? "Start \(appState.answers.displayChild)'s free trial" : "Start \(appState.answers.displayChild)'s calmer bedtimes")
                 }
             }
             .buttonStyle(.ajPrimary)
@@ -180,10 +180,10 @@ struct PaywallView: View {
     }
 
     private func beforeText(_ a: OnboardingAnswers) -> String {
-        switch a.selected("lotionTime").first {
-        case "tears": return "Tears and battles at lotion time"
+        switch a.selected("creamTime").first {
+        case "tears": return "Tears and battles at cream time"
         case "runs": return "Chasing \(a.displayChild) with the moisturizer"
-        case "wriggles": return "Wriggling, rushed lotion time"
+        case "wriggles": return "Wriggling, rushed cream time"
         default: return "Long, tiring bedtimes"
         }
     }
@@ -207,8 +207,8 @@ private struct TrialTimeline: View {
         let end = Calendar.current.date(byAdding: .day, value: trialDays, to: today) ?? today
         let reminder = Calendar.current.date(byAdding: .day, value: -AppConfig.trialReminderDaysBefore, to: end) ?? end
         AJCard {
-            Text("How your free week works").ajText(.headline)
-            row(when: "Today", text: "Every ritual, story and the doctor report unlock.", tone: AJColor.accentCalm)
+            Text("How your \(trialDays)-day free trial works").ajText(.headline)
+            row(when: "Today", text: "Every massage story, bedtime story and affirmation unlocks.", tone: AJColor.accentCalm)
             row(when: reminder.formatted(.dateTime.month(.abbreviated).day()),
                 text: "We'll remind you that your trial is ending. The reminder is on.", tone: AJColor.accentCalm)
             row(when: end.formatted(.dateTime.month(.abbreviated).day()),
