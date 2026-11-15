@@ -43,9 +43,9 @@ struct PaywallView: View {
                         TrialTimeline(price: yearly.displayPrice, trialDays: yearly.trialDays ?? 3)
                     } else {
                         VStack(alignment: .leading, spacing: AJSpacing.sm) {
-                            AJBenefitRow("Every ritual, story and technique")
+                            AJBenefitRow("Every massage story, bedtime story and affirmation")
                             AJBenefitRow("Gentle flare-night guidance")
-                            AJBenefitRow("Doctor-ready report, in 2 seconds a night")
+                            AJBenefitRow("Create your own stories about what they love")
                         }
                     }
                 }
@@ -265,8 +265,8 @@ struct SecondOfferView: View {
                         }
                     }
                     VStack(alignment: .leading, spacing: AJSpacing.sm) {
-                        AJBenefitRow("Every ritual, story and technique")
-                        AJBenefitRow("The doctor-ready report")
+                        AJBenefitRow("Every massage story, bedtime story and affirmation")
+                        AJBenefitRow("Create your own stories")
                         AJBenefitRow("Cancel anytime in Settings")
                     }
                 }
