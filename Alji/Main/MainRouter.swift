@@ -57,9 +57,42 @@ final class MainRouter {
     }
 
     func quiet() {
+        affirmationsEnd = nil
         narrator.stop()
         music.fadeOut(over: 1.5)
         noise.stop()
+    }
+
+    // MARK: Affirmations after the massage
+
+    @ObservationIgnored private var affirmationsEnd: Date?
+
+    /// Plays affirmations softly on repeat for `minutes`, then fades out. 0 turns them off.
+    func playAffirmations(_ text: String, minutes: Int, voiceOn: Bool, musicOn: Bool) {
+        narrator.stop()
+        guard minutes > 0 else {
+            affirmationsEnd = nil
+            music.fadeOut(over: 1.5)
+            return
+        }
+        let end = Date.now.addingTimeInterval(Double(minutes) * 60)
+        affirmationsEnd = end
+        startMusic(musicOn, volume: 0.06)
+        if voiceOn { repeatAffirmations(text, until: end) }
+        Task {
+            try? await Task.sleep(for: .seconds(minutes * 60))
+            if affirmationsEnd == end { quiet() }
+        }
+    }
+
+    private func repeatAffirmations(_ text: String, until end: Date) {
+        guard affirmationsEnd == end, Date.now < end else { return }
+        narrator.speak(text, volume: 0.6) { [weak self] in
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(8))
+                self?.repeatAffirmations(text, until: end)
+            }
+        }
     }
 
     func startMusic(_ isOn: Bool, volume: Float = 0.12) {

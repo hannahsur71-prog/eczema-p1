@@ -40,8 +40,11 @@ scripts/check-fonts.sh          Fails if any screen styles fonts outside the des
 ## The main app
 Built screen for screen from the approved prototype. Three tabs:
 - **Tonight**: one button. "How's the skin tonight?" (Calm → tonight's massage story, Flaring → the shorter
-  gentle story), then the player, a star on the moon, a two-question check-in, and affirmations in the dark.
-  The next morning it asks how the night went and shows the result.
+  gentle story), then the follow-along player: each step opens with a few seconds of "Watch first" (the hands
+  show the move, the voice says what to do), then "Your turn" with the story. At the end a star lands on the moon
+  and affirmations start by themselves (off, 20 minutes, 1 hour or 2 hours); nothing is asked at night and the
+  screen goes dark. One notification the next morning asks three quick questions plus a story rating, and the
+  result shows a small reward every day. Tonight's story changes every three nights.
 - **Stories**: massage stories, audio-only bedtime stories (5, 10 or 20 minutes), affirmations, calm moments,
   favorites, and Create a story.
 - **Progress**: time back for you, this month's moon, itch trend, rings, milestones, totals, research.

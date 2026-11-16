@@ -53,3 +53,29 @@ extension ReminderScheduler {
         try? await center.add(UNNotificationRequest(identifier: trialIdentifier, content: content, trigger: trigger))
     }
 }
+
+extension ReminderScheduler {
+    private static let morningIdentifier = "morning.checkin"
+
+    /// One quiet notification the morning after a ritual, asking how the night went.
+    /// Only sent if notifications are already allowed; it never asks for permission at bedtime.
+    static func scheduleMorningCheckIn(childName: String) async {
+        let center = UNUserNotificationCenter.current()
+        guard await center.notificationSettings().authorizationStatus == .authorized else { return }
+        let calendar = Calendar.current
+        let now = Date.now
+        // The next 7:30 am. A ritual finished after midnight still gets the same morning.
+        var parts = calendar.dateComponents([.year, .month, .day], from: now)
+        parts.hour = 7
+        parts.minute = 30
+        guard var fire = calendar.date(from: parts) else { return }
+        if fire <= now { fire = calendar.date(byAdding: .day, value: 1, to: fire) ?? fire }
+        let content = UNMutableNotificationContent()
+        content.title = "How did \(childName) sleep?"
+        content.body = "Three taps, and a new star is waiting."
+        let trigger = UNCalendarNotificationTrigger(
+            dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fire), repeats: false)
+        center.removePendingNotificationRequests(withIdentifiers: [morningIdentifier])
+        try? await center.add(UNNotificationRequest(identifier: morningIdentifier, content: content, trigger: trigger))
+    }
+}

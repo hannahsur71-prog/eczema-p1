@@ -221,7 +221,7 @@ struct StoryDetailView: View {
             router.open(.audio(item.id))
         } else {
             // The story they chose becomes tonight's story (the gentle flare story is always offered separately).
-            if item.id != "flareStory" { appState.tonightStoryID = item.id }
+            if item.id != "flareStory" { appState.chooseTonightStory(item.id) }
             router.open(.player(storyID: item.id, isFlare: item.id == "flareStory", greets: false))
         }
     }

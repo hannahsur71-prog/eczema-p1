@@ -1,7 +1,8 @@
 import SwiftUI
 import AljiDesignSystem
 
-/// The massage story: the figure shows the stroke, the voice tells the story, and steps move on by themselves.
+/// The massage story, as a follow-along. Each step opens with a few seconds of "Watch first": the hands show the
+/// move and the voice says what to do. Then "Your turn": the story plays while the parent follows the screen.
 struct MassagePlayerView: View {
     let storyID: String
     let isFlare: Bool
@@ -16,6 +17,8 @@ struct MassagePlayerView: View {
     @State private var index = 0
     @State private var left = 0
     @State private var isPlaying = true
+    /// True during the few seconds of "Watch first" that open each step.
+    @State private var isPreview = false
     @State private var showGreeting = false
     @State private var showSound = false
     @State private var noiseKind: NoiseEngine.Kind?
@@ -47,7 +50,7 @@ struct MassagePlayerView: View {
             while isPlaying && !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(1))
                 if Task.isCancelled || !isPlaying { return }
-                if left > 1 { left -= 1 } else { advance(1) }
+                if left > 1 { left -= 1 } else if isPreview { startTurn() } else { advance(1) }
             }
         }
     }
@@ -75,6 +78,7 @@ struct MassagePlayerView: View {
 
     private func controls(_ step: MassageStep) -> some View {
         VStack(alignment: .leading, spacing: AJSpacing.sm) {
+            phaseChip
             HStack(alignment: .firstTextBaseline, spacing: AJSpacing.xs) {
                 Text(step.label).ajText(.title2).frame(maxWidth: .infinity, alignment: .leading)
                 Text(step.reps)
@@ -114,6 +118,17 @@ struct MassagePlayerView: View {
         }
         .padding(.horizontal, AJSpacing.screenGutter)
         .padding(.bottom, AJSpacing.md)
+    }
+
+    /// "Watch first · 3" while the move is being shown, then "Your turn".
+    private var phaseChip: some View {
+        Text(isPreview ? "Watch first · \(left)" : "Your turn")
+            .ajText(.footnoteStrong, color: isPreview ? AJColor.onAccent : Color(hex: 0xBDE9F7))
+            .padding(.horizontal, AJSpacing.sm)
+            .padding(.vertical, 5)
+            .background(isPreview ? AJColor.accentWarm : AJColor.accentCalm.opacity(0.22), in: Capsule())
+            .overlay(Capsule().strokeBorder(isPreview ? Color.clear : AJColor.accentCalm, lineWidth: 1.5))
+            .accessibilityAddTraits(.updatesFrequently)
     }
 
     private var greeting: some View {
@@ -161,7 +176,8 @@ struct MassagePlayerView: View {
 
     private var progress: Double {
         let total = max(1, lengths.reduce(0, +))
-        let done = lengths.prefix(index).reduce(0, +) + max(0, (lengths.indices.contains(index) ? lengths[index] : 0) - left)
+        let current = isPreview ? 0 : max(0, (lengths.indices.contains(index) ? lengths[index] : 0) - left)
+        let done = lengths.prefix(index).reduce(0, +) + current
         return min(1, Double(done) / Double(total))
     }
 
@@ -181,8 +197,6 @@ struct MassagePlayerView: View {
         }
         title = item.title.personalized(appState.child)
         steps = StoryCatalog.playableSteps(item, short: isShort, child: appState.child)
-        index = 0
-        left = lengths.first ?? 0
         isPlaying = true
         // The parent's hands are busy, so the screen must not lock mid-massage.
         UIApplication.shared.isIdleTimerDisabled = true
@@ -193,10 +207,33 @@ struct MassagePlayerView: View {
                 try? await Task.sleep(for: .seconds(2.4))
                 withAnimation(.easeOut(duration: 0.4)) { showGreeting = false }
             }
-            speak("Good evening, \(appState.child). " + (steps.first?.story.personalized(appState.child) ?? ""))
-        } else {
-            speakStep()
         }
+        begin(0, greeting: greets ? "Good evening, \(appState.child). " : "")
+    }
+
+    /// Seconds of "Watch first" before each step.
+    private let previewSeconds = 6
+
+    /// Opens a step with its preview. Roll-over steps are self-explanatory, so they skip it.
+    private func begin(_ newIndex: Int, greeting: String = "") {
+        guard steps.indices.contains(newIndex) else { return }
+        index = newIndex
+        let step = steps[newIndex]
+        if step.view == "turn" || step.view == "turnBack" {
+            isPreview = false
+            left = lengths[newIndex]
+            speak(greeting + step.story.personalized(appState.child))
+        } else {
+            isPreview = true
+            left = previewSeconds
+            speak(greeting + "Watch first. \(step.cue.personalized(appState.child)).")
+        }
+    }
+
+    private func startTurn() {
+        isPreview = false
+        left = lengths.indices.contains(index) ? lengths[index] : 0
+        if let step { speak("Your turn. " + step.story.personalized(appState.child)) }
     }
 
     private func speak(_ text: String) {
@@ -205,7 +242,8 @@ struct MassagePlayerView: View {
     }
 
     private func speakStep() {
-        if let step { speak(step.story.personalized(appState.child)) }
+        guard let step else { return }
+        speak((isPreview ? step.cue : step.story).personalized(appState.child))
     }
 
     private func advance(_ delta: Int) {
@@ -217,9 +255,7 @@ struct MassagePlayerView: View {
             router.open(.end(storyID: storyID, minutes: minutes, isFlare: isFlare))
             return
         }
-        index = max(0, next)
-        left = lengths[index]
-        speakStep()
+        begin(max(0, next))
     }
 
     private func togglePlay() {
@@ -236,7 +272,8 @@ struct MassagePlayerView: View {
 
 // MARK: - End of the ritual
 
-/// A new star lands on the moon, then a rating and a two-question check-in.
+/// A new star lands on the moon and affirmations begin by themselves. Nothing is asked at night;
+/// the screen goes dark after a few seconds.
 struct RitualEndView: View {
     let storyID: String
     let minutes: Int
@@ -244,70 +281,72 @@ struct RitualEndView: View {
 
     @Environment(AppState.self) private var appState
     @Environment(MainRouter.self) private var router
-    @State private var rating = 0
-    @State private var itch: String?
-    @State private var cream: String?
     @State private var starLanded = false
+    @State private var hasRecorded = false
+
+    private let lengths: [(minutes: Int, label: String)] = [(0, "Off"), (20, "20 min"), (60, "1 hour"), (120, "2 hours")]
 
     var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(spacing: AJSpacing.md + 2) {
-                    ZStack {
-                        AJMoon(size: 130)
-                        AJStar(size: 40)
-                            .offset(x: starLanded ? 34 : -76, y: starLanded ? -40 : 110)
-                            .scaleEffect(starLanded ? 1 : 0.3)
-                            .rotationEffect(.degrees(starLanded ? 0 : -90))
-                            .opacity(starLanded ? 1 : 0)
-                    }
-                    .frame(height: 130)
-                    .accessibilityHidden(true)
-                    Text("Sweet dreams").ajText(.display)
-                    Text("A new star on \(appState.child)'s moon").ajText(.callout, color: AJColor.starGlow)
-                    VStack(spacing: AJSpacing.xs) {
-                        Text("Did \(appState.child) enjoy the story?").ajText(.callout)
-                        HStack(spacing: AJSpacing.xs) {
-                            ForEach(1...5, id: \.self) { value in
-                                Button { rating = value } label: {
-                                    AJStar(size: 34, isLit: value <= rating).frame(width: 48, height: 48)
-                                }
-                                .buttonStyle(.plain)
-                                .accessibilityLabel("\(value) stars")
-                                .accessibilityAddTraits(value == rating ? .isSelected : [])
-                            }
+        VStack(spacing: AJSpacing.md + 2) {
+            ZStack {
+                AJMoon(size: 130)
+                AJStar(size: 40)
+                    .offset(x: starLanded ? 34 : -76, y: starLanded ? -40 : 110)
+                    .scaleEffect(starLanded ? 1 : 0.3)
+                    .rotationEffect(.degrees(starLanded ? 0 : -90))
+                    .opacity(starLanded ? 1 : 0)
+            }
+            .frame(height: 130)
+            .accessibilityHidden(true)
+            Text("Sweet dreams").ajText(.display)
+            Text("A new star on \(appState.child)'s moon").ajText(.callout, color: AJColor.starGlow)
+            VStack(spacing: 10) {
+                Text(appState.affirmationMinutes > 0 ? "Affirmations are starting" : "Affirmations are off").ajText(.callout)
+                FlowLayout(spacing: AJSpacing.xs) {
+                    ForEach(lengths, id: \.minutes) { option in
+                        AJChoiceChip(option.label, isSelected: appState.affirmationMinutes == option.minutes) {
+                            appState.affirmationMinutes = option.minutes
+                            playAffirmations()
                         }
                     }
-                    CheckInGroup(title: "How itchy was tonight?", options: CheckIn.itch, selection: $itch)
-                    CheckInGroup(title: "How did cream time go?", options: CheckIn.cream, selection: $cream)
                 }
-                .padding(.horizontal, AJSpacing.lg)
-                .padding(.top, AJSpacing.lg)
-                .frame(maxWidth: .infinity)
+                Text("They play from this device, so leave it in \(appState.child)'s room. A tablet works well if you need your phone.")
+                    .ajText(.footnote, color: AJColor.textSecondary)
             }
-            VStack(spacing: AJSpacing.xs) {
-                Button("Done. Play affirmations") { finish(logged: true) }.buttonStyle(.ajPrimary)
-                Button("Skip. Remind me in the morning") { finish(logged: false) }.buttonStyle(.ajGhost)
-            }
-            .padding(.horizontal, AJSpacing.lg)
-            .padding(.bottom, AJSpacing.md)
+            .padding(.top, AJSpacing.xs)
+            Spacer(minLength: 0)
+            Text("No questions tonight. The screen goes dark in a few seconds.").ajText(.footnote, color: AJColor.textTertiary)
+            Button("Goodnight") { router.open(.dark) }.buttonStyle(.ajPrimary)
         }
+        .multilineTextAlignment(.center)
+        .padding(.horizontal, AJSpacing.lg)
+        .padding(.top, AJSpacing.lg)
+        .padding(.bottom, AJSpacing.md)
         .onAppear {
             withAnimation(.spring(response: 0.9, dampingFraction: 0.7).delay(0.2)) { starLanded = true }
+            guard !hasRecorded else { return }
+            hasRecorded = true
+            appState.finishRitual(storyID: storyID, minutes: minutes, wasFlare: isFlare)
+            playAffirmations()
+            Task { await ReminderScheduler.scheduleMorningCheckIn(childName: appState.child) }
+        }
+        .task(id: appState.affirmationMinutes) {
+            // Dim by itself. Changing the length restarts the countdown so the parent isn't cut off mid-choice.
+            try? await Task.sleep(for: .seconds(9))
+            if !Task.isCancelled && router.screen == .end(storyID: storyID, minutes: minutes, isFlare: isFlare) { router.open(.dark) }
         }
     }
 
-    private func finish(logged: Bool) {
-        appState.finishRitual(storyID: storyID, minutes: minutes, wasFlare: isFlare, rating: rating,
-                              itch: logged ? itch : nil, cream: logged ? cream : nil)
-        router.open(.dark)
+    private func playAffirmations() {
+        let lines = StoryCatalog.item("brave", custom: nil)?.lines ?? []
+        router.playAffirmations(lines.joined(separator: " ").personalized(appState.child), minutes: appState.affirmationMinutes,
+                                voiceOn: appState.voiceOn, musicOn: appState.musicOn)
     }
 }
 
-/// The answers used by the night and morning check-ins.
+/// The answers used by the morning check-in.
 enum CheckIn {
     static let itch = ["Calm", "A bit itchy", "Very itchy"]
-    static let cream = ["Easy", "Some fuss", "A battle"]
     static let fall = ["Under 15 min", "15–30 min", "30–60 min", "Over an hour"]
     static let wakes = ["0", "1", "2", "3+"]
 
@@ -341,46 +380,30 @@ struct CheckInGroup: View {
 
 // MARK: - Affirmations in the dark
 
-/// After the massage: the screen goes dark and affirmations play softly for up to two hours.
+/// The screen is dark while affirmations play. Tap to wake.
 struct AffirmationsDarkView: View {
     @Environment(AppState.self) private var appState
     @Environment(MainRouter.self) private var router
-    @State private var startedAt = Date.now
 
-    private let limit: TimeInterval = 2 * 60 * 60
+    private var length: String {
+        let minutes = appState.affirmationMinutes
+        return minutes >= 60 ? (minutes == 60 ? "1 hour" : "\(minutes / 60) hours") : "\(minutes) min"
+    }
 
     var body: some View {
+        let isOn = appState.affirmationMinutes > 0
+        let dim = Color(hex: 0x6E6A94)
         Button(action: wake) {
             VStack(spacing: AJSpacing.sm) {
-                AJMoon(size: 70, color: Color(hex: 0x6E6A94))
-                Text("Affirmations are playing softly").ajText(.subhead, color: Color(hex: 0x6E6A94))
-                Text("Up to 2 hours · tap to wake the screen").ajText(.footnote, color: Color(hex: 0x6E6A94))
+                AJMoon(size: 70, color: dim)
+                Text(isOn ? "Affirmations are playing softly" : "Goodnight, \(appState.child)").ajText(.subhead, color: dim)
+                Text((isOn ? "\(length) · " : "") + "tap to wake the screen").ajText(.footnote, color: dim)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color(hex: 0x05040F).ignoresSafeArea())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Affirmations are playing. Tap to wake the screen.")
-        .onAppear {
-            startedAt = .now
-            router.startMusic(appState.musicOn, volume: 0.06)
-            playLoop()
-        }
-    }
-
-    private func playLoop() {
-        guard appState.voiceOn, Date.now.timeIntervalSince(startedAt) < limit,
-              let item = StoryCatalog.item("brave", custom: nil) else {
-            if Date.now.timeIntervalSince(startedAt) >= limit { router.quiet() }
-            return
-        }
-        let text = item.lines.joined(separator: " ").personalized(appState.child)
-        router.narrator.speak(text, volume: 0.6) {
-            Task { @MainActor in
-                try? await Task.sleep(for: .seconds(8))
-                if router.screen == .dark { playLoop() }
-            }
-        }
+        .accessibilityLabel(isOn ? "Affirmations are playing. Tap to wake the screen." : "Tap to wake the screen.")
     }
 
     private func wake() {
