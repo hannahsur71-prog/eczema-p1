@@ -20,7 +20,7 @@ public struct AJCatalogView: View {
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AJSpacing.xl) {
-                AJScreenHeader(eyebrow: "Design system", title: "Alji",
+                AJScreenHeader(eyebrow: "Design system", title: "Snuzzle",
                                subtitle: "One font family, one palette, one set of components.", isHero: true)
 
                 stars

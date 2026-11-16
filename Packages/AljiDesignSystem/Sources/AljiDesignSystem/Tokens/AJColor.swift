@@ -54,7 +54,7 @@ public enum AJColor {
     public static let coralText = Color(hex: 0xF5C3BB)
 
     // MARK: Gradients
-    /// Hopeful result cards ("Alji's goal for you", "time back").
+    /// Hopeful result cards ("Snuzzle's goal for you", "time back").
     public static let hopeGradient = LinearGradient(
         colors: [Color(hex: 0x2E5E8C), Color(hex: 0x5A4BA8)],
         startPoint: .topLeading, endPoint: .bottomTrailing)

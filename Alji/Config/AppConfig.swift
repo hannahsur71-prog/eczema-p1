@@ -2,7 +2,7 @@ import Foundation
 
 /// Everything you need to change before submitting to the App Store lives here.
 enum AppConfig {
-    static let appName = "Alji"
+    static let appName = "Snuzzle"
 
     // MARK: Subscriptions (must match App Store Connect and Products.storekit)
     // Pricing follows the category leaders: annual plan with a 3-day free trial (the playbook's
@@ -32,7 +32,7 @@ enum AppConfig {
     // TODO: rewrite in your own words. Draft based on your story.
     static let founderNote = """
     I grew up with eczema. Every night my mom massaged my cream in and tucked me in under the glow-in-the-dark \
-    stars on my ceiling. The itch didn't always go away, but bedtime felt safe. Alji is that ritual, \
+    stars on my ceiling. The itch didn't always go away, but bedtime felt safe. Snuzzle is that ritual, \
     for every family living with eczema.
     """
 
@@ -43,7 +43,7 @@ enum AppConfig {
     static let testimonials: [Testimonial] = []
 
     static let medicalDisclaimer = """
-    Alji is a bedtime routine guide, not medical care. It does not diagnose or treat eczema. \
+    Snuzzle is a bedtime routine guide, not medical care. It does not diagnose or treat eczema. \
     Follow your doctor's treatment plan and skip broken, oozing or infected skin.
     """
 }

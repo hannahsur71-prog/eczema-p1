@@ -1,4 +1,7 @@
-# Alji (working name)
+# Snuzzle (working name)
+
+The app shows the name Snuzzle to users. The project, folders and code still use the earlier name Alji;
+rename those only once the name is final.
 
 A screen-free bedtime ritual app for families with eczema. The parent massages moisturizer in,
 guided by a calm voice and spa music, then the child drifts off to a story. Native iOS, SwiftUI,

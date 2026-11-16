@@ -259,7 +259,7 @@ struct CreateStoryView: View {
                             AJChoiceChip(lesson.label, isSelected: request.lesson == lesson.id) { request.lesson = lesson.id }
                         }
                     }
-                    Text("Lumi writes the words. The massage strokes always come from Alji's reviewed routine, and you can read the story before you play it.")
+                    Text("Lumi writes the words. The massage strokes always come from Snuzzle's reviewed routine, and you can read the story before you play it.")
                         .ajText(.footnote, color: AJColor.textTertiary)
                 }
                 .padding(.horizontal, AJSpacing.screenGutter)

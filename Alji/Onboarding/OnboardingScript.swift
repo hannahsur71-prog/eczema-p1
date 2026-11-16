@@ -160,17 +160,17 @@ enum OnboardingScript {
 
         let severityInsight: OBScreen
         if d.isSevere {
-            severityInsight = insight("For harder nights, Alji *focuses on comfort*",
+            severityInsight = insight("For harder nights, Snuzzle *focuses on comfort*",
                 body: "With severe eczema, \(c)'s plan leans on what soothes without rubbing: affirmations that build confidence in their skin, audio bedtime stories to relax, and gentle touch, like still hands and slow strokes on calm skin only. On flaring skin you just smooth the cream on, exactly as \(c)'s doctor directed.",
-                source: "Alji is a bedtime routine, not a medical treatment. Severe eczema needs a doctor's care plan.", cta: "Sounds right")
+                source: "Snuzzle is a bedtime routine, not a medical treatment. Severe eczema needs a doctor's care plan.", cta: "Sounds right")
         } else if d.picks["severity"] == "unsure" {
             severityInsight = insight("Not sure? *That's okay.*",
                 body: "Many parents aren't. A quick guide: mild is a few dry, itchy patches. Moderate is several areas with regular flares. Severe is widespread, cracked or weeping skin. We'll start gently, and \(c)'s doctor can tell you for sure.",
-                source: "Alji is a bedtime routine, not a medical treatment.")
+                source: "Snuzzle is a bedtime routine, not a medical treatment.")
         } else {
-            severityInsight = insight("Alji is made for *mild to moderate* eczema",
-                body: "That's most children with eczema. Alji works alongside the care \(c)'s doctor recommends, never instead of it: a calm, screen-free routine that makes nightly moisturizing easier.",
-                source: "Alji is a bedtime routine, not a medical treatment. If eczema becomes severe or infected, see a doctor.")
+            severityInsight = insight("Snuzzle is made for *mild to moderate* eczema",
+                body: "That's most children with eczema. Snuzzle works alongside the care \(c)'s doctor recommends, never instead of it: a calm, screen-free routine that makes nightly moisturizing easier.",
+                source: "Snuzzle is a bedtime routine, not a medical treatment. If eczema becomes severe or infected, see a doctor.")
         }
 
         let wakingInsight: OBScreen
@@ -190,22 +190,22 @@ enum OnboardingScript {
 
         let creamInsight = d.q["lotionTime"] == "fine"
             ? insight("Good. Let's make it *the best part* of the night",
-                      body: "Cream time already goes smoothly for \(c). Alji turns it into something to look forward to: a story, your hands, and time together.")
+                      body: "Cream time already goes smoothly for \(c). Snuzzle turns it into something to look forward to: a story, your hands, and time together.")
             : insight("It's not you. Cream time was *never designed to feel good*.",
-                      body: "Alji turns it into a story \(c) wants to hear, so the cream goes on while they lie still and listen.")
+                      body: "Snuzzle turns it into a story \(c) wants to hear, so the cream goes on while they lie still and listen.")
 
         let triedTitles = ["tracker": "Trackers help you *spot patterns*", "sleepapp": "Sleep stories help kids *drift off*",
                            "cream": "Quick is *understandable*", "nothing": "You're starting at *the right place*",
                            "other": "Thank you for *telling us*"]
         let triedBodies = [
-            "tracker": "That's useful. Alji adds the part trackers don't cover: a calm ritual for the cream itself, plus a 2-second nightly check-in.",
-            "sleepapp": "They're great for winding down. They don't help the moisturizer go on, though. Alji does both: a story that guides the cream, then sleep.",
+            "tracker": "That's useful. Snuzzle adds the part trackers don't cover: a calm ritual for the cream itself, plus a 2-second nightly check-in.",
+            "sleepapp": "They're great for winding down. They don't help the moisturizer go on, though. Snuzzle does both: a story that guides the cream, then sleep.",
             "cream": "A story gives \(c) a reason to lie still, so there's time to get the cream on everywhere.",
-            "nothing": "Alji gives you one simple nightly ritual: bath, cream with a guided massage story, then sleep.",
-            "other": "Every family finds its own way. Alji builds on what you've already learned, and your answer helps us improve."]
+            "nothing": "Snuzzle gives you one simple nightly ritual: bath, cream with a guided massage story, then sleep.",
+            "other": "Every family finds its own way. Snuzzle builds on what you've already learned, and your answer helps us improve."]
         let tried = d.q["tried"] ?? ""
-        let triedInsight = insight(triedTitles[tried] ?? "Here's how *Alji fits in*",
-                                   body: triedBodies[tried] ?? "Alji turns the moisturizer itself into a calming ritual.")
+        let triedInsight = insight(triedTitles[tried] ?? "Here's how *Snuzzle fits in*",
+                                   body: triedBodies[tried] ?? "Snuzzle turns the moisturizer itself into a calming ritual.")
 
         let parentSleepInsight = d.q["parentSleep"] == "good"
             ? insight("Glad you're *sleeping well*",
@@ -217,7 +217,7 @@ enum OnboardingScript {
                       source: "Lin et al., Frontiers in Public Health, 2023.")
 
         let fixes = environment(d).filter { !$0.ok }.count
-        let rx = "Got it. Alji will remind you to apply it first, exactly as prescribed, before the massage."
+        let rx = "Got it. Snuzzle will remind you to apply it first, exactly as prescribed, before the massage."
         let welcomeDeal = d.isYearly
             ? " Free until \(dateString(daysFromNow: 3)). We'll remind you on \(dateString(daysFromNow: 2)). Then $59.99 a year."
             : " $9.99 a month."
@@ -225,10 +225,10 @@ enum OnboardingScript {
         var list: [OBScreen] = [
             OBScreen(.hero, "Bedtime can be the *calmest part* of your day.") {
                 $0.showsArt = true; $0.isCentered = true; $0.showsBar = false; $0.cta = "Get started"
-                $0.body = "Alji turns your child's nightly moisturizer into a calming massage-and-story ritual, made for eczema skin."
+                $0.body = "Snuzzle turns your child's nightly moisturizer into a calming massage-and-story ritual, made for eczema skin."
             },
             insight("“My mom massaged my cream in and tucked me in under *glow-in-the-dark stars*.”",
-                    body: "I grew up with eczema. The itch didn't always go away, but bedtime felt safe. Alji is that ritual, for every family living with eczema. — Hannah, founder"),
+                    body: "I grew up with eczema. The itch didn't always go away, but bedtime felt safe. Snuzzle is that ritual, for every family living with eczema. — Hannah, founder"),
             OBScreen(.featureDemo, "A bedtime story that *guides your hands*") {
                 $0.body = "Press play. Lumi's story tells you each massage stroke while you smooth the moisturizer in."
             },
@@ -294,7 +294,7 @@ enum OnboardingScript {
                      [("right", "Moisturizer goes on right away"), ("later", "Moisturizer goes on later"), ("skip", "We often skip moisturizer"), ("nobath", "No bath most nights")]),
             question("cream", "Does *\(c)* use a prescribed cream or ointment?",
                      [("steroid", "Yes, a steroid cream or ointment"), ("nonsteroid", "Yes, a non-steroid prescription"), ("moisturizer", "Only moisturizer"), ("unsure", "Not sure")],
-                     note: "Alji will remind you to apply it first, exactly as your doctor directed."),
+                     note: "Snuzzle will remind you to apply it first, exactly as your doctor directed."),
             OBScreen(.environment, "*\(c)'s* ideal eczema bedroom") {
                 $0.body = fixes == 0 ? "You're already doing all of this. Lovely." : "\(fixes) small changes could make nights easier. We'll add them to \(c)'s plan."
                 $0.source = "Based on guidance from the American Academy of Dermatology and the National Eczema Association."
@@ -304,7 +304,7 @@ enum OnboardingScript {
             question("parentSleep", "And how are *you* sleeping\(parent.isEmpty ? "" : ", \(parent)")?",
                      [("good", "Pretty well"), ("ok", "Okay, but tired"), ("broken", "Broken sleep most nights"), ("running", "I'm running on empty")]),
             parentSleepInsight,
-            insight("Alji is *screen-free* for \(c)",
+            insight("Snuzzle is *screen-free* for \(c)",
                     body: "You hold the phone. \(c) just listens and feels your hands. Pediatricians recommend no screens in the hour before bed.",
                     source: "American Academy of Pediatrics; Akacem et al., Journal of Pineal Research, 2022."),
             OBScreen(.multi, "What would you most like to help *\(c)* with?") {
@@ -342,7 +342,7 @@ enum OnboardingScript {
             },
             OBScreen(.rate, "Support the *mission*") {
                 $0.isCentered = true; $0.cta = "Rate and continue"; $0.secondary = "Not now"
-                $0.body = "Alji is made by a founder who grew up with eczema. A quick rating helps other families find it."
+                $0.body = "Snuzzle is made by a founder who grew up with eczema. A quick rating helps other families find it."
             },
             OBScreen(.signin, "Save *\(c)'s* plan") {
                 $0.isCentered = true; $0.cta = nil; $0.secondary = "Skip for now"
@@ -382,7 +382,7 @@ enum OnboardingScript {
                           "layers": "Layers trap heat, and heat feeds itch. Lighter is usually better."],
             "bath": ["right": "Exactly right. Cream on damp skin locks moisture in.",
                      "later": "Sooner helps: cream works best while skin is still damp.",
-                     "skip": "That's common, and it's the step Alji makes easiest.",
+                     "skip": "That's common, and it's the step Snuzzle makes easiest.",
                      "nobath": "That's okay. The ritual works without a bath too."],
             "cream": ["steroid": rx, "nonsteroid": rx,
                       "moisturizer": "Great. The massage story is built around that moisturizer.",
@@ -441,7 +441,7 @@ enum OnboardingScript {
                                            : "Loose, soft cotton is gentlest. Wool and scratchy fabrics can irritate eczema skin."),
             OBEnvironmentItem(ok: bath, title: "Moisturize right after the bath",
                               text: bath ? "Already doing this. Cream on damp skin after a short, lukewarm bath locks in moisture."
-                                         : "After a 5–10 minute lukewarm bath, pat dry and put the cream on while skin is still damp. Alji's ritual starts right there."),
+                                         : "After a 5–10 minute lukewarm bath, pat dry and put the cream on while skin is still damp. Snuzzle's ritual starts right there."),
             OBEnvironmentItem(ok: false, title: "Fragrance-free laundry and products",
                               text: "Fragrance is a common irritant. Choose fragrance-free detergent and moisturizer."),
             OBEnvironmentItem(ok: false, title: "Short, smooth nails", text: "Keeps night scratching from breaking the skin.")

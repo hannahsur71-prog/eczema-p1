@@ -99,7 +99,7 @@ struct ArtView: View {
     }
 }
 
-/// The night-sky background with glow-sticker stars, used across Alji.
+/// The night-sky background with glow-sticker stars, used across Snuzzle.
 struct StarryBackground: View {
     var opacity: Double = 0.45
     var seed: UInt64 = 7

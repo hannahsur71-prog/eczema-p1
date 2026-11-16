@@ -241,7 +241,7 @@ struct OnboardingContent: View {
             HStack(spacing: 14) {
                 Image(aj: .moon).ajIcon(44, color: AJColor.accentWarm).accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Alji's goal for you").ajText(.label, color: Color(hex: 0xBDE9F7))
+                    Text("Snuzzle's goal for you").ajText(.label, color: Color(hex: 0xBDE9F7))
                     Text("Calmer bedtimes and fewer wake-ups: up to \(numbers.gainHours) hours back this year, for both of you.")
                         .ajText(.bodyStrong)
                 }
@@ -275,7 +275,7 @@ struct OnboardingContent: View {
                       chips: OnboardingScript.beforeChips(draft), chipColor: AJColor.coralText,
                       fill: Color(hex: 0x3B2E52), border: AJColor.coral.opacity(0.6))
             Image(aj: .arrowDown).ajIcon(22, color: AJColor.accentWarm).accessibilityHidden(true)
-            sceneCard(shapes: ArtData.after, label: "A month in, with Alji", labelColor: AJColor.accentCalm, line: OnboardingScript.afterLine(draft),
+            sceneCard(shapes: ArtData.after, label: "A month in, with Snuzzle", labelColor: AJColor.accentCalm, line: OnboardingScript.afterLine(draft),
                       chips: OnboardingScript.afterChips(draft), chipColor: Color(hex: 0xBDE9F7),
                       fill: AJColor.surfaceDeep, border: AJColor.accentCalm)
         }
