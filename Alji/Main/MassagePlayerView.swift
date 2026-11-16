@@ -1,8 +1,9 @@
 import SwiftUI
 import AljiDesignSystem
 
-/// The massage story, as a follow-along. Each step opens with a few seconds of "Watch first": the hands show the
-/// move and the voice says what to do. Then "Your turn": the story plays while the parent follows the screen.
+/// The massage story, as a follow-along. Each step opens with a short "Preview": the timer pauses, the hands show the
+/// move and the voice says what to do. Then "Your turn": the timer continues and the story plays, with a scene from
+/// the story behind the figure.
 struct MassagePlayerView: View {
     let storyID: String
     let isFlare: Bool
@@ -17,7 +18,7 @@ struct MassagePlayerView: View {
     @State private var index = 0
     @State private var left = 0
     @State private var isPlaying = true
-    /// True during the few seconds of "Watch first" that open each step.
+    /// True during the few seconds of "Preview" that open each step. The massage timer is paused meanwhile.
     @State private var isPreview = false
     @State private var showGreeting = false
     @State private var showSound = false
@@ -34,6 +35,9 @@ struct MassagePlayerView: View {
                     MassageStepFigure(step: step)
                         .frame(maxWidth: 340, maxHeight: .infinity)
                         .padding(.horizontal, AJSpacing.md)
+                        .frame(maxWidth: .infinity)
+                        .background(StoryScene(storyLine: step.story))
+                        .clipped()
                     controls(step)
                 } else {
                     Spacer()
@@ -93,7 +97,7 @@ struct MassagePlayerView: View {
                 Text("Flare night: skip flaring spots, massage calm skin only.").ajText(.footnote, color: AJColor.coralText)
             }
             VStack(alignment: .leading, spacing: 6) {
-                AJProgressTrack(progress: progress)
+                AJProgressTrack(progress: progress, isPaused: isPreview)
                 Text(timeLeft).ajText(.footnote, color: AJColor.textSecondary)
             }
             HStack(spacing: 46) {
@@ -120,9 +124,9 @@ struct MassagePlayerView: View {
         .padding(.bottom, AJSpacing.md)
     }
 
-    /// "Watch first · 3" while the move is being shown, then "Your turn".
+    /// "Preview · 3" while the move is being shown, then "Your turn".
     private var phaseChip: some View {
-        Text(isPreview ? "Watch first · \(left)" : "Your turn")
+        Text(isPreview ? "Preview · \(left)" : "Your turn")
             .ajText(.footnoteStrong, color: isPreview ? AJColor.onAccent : Color(hex: 0xBDE9F7))
             .padding(.horizontal, AJSpacing.sm)
             .padding(.vertical, 5)
@@ -182,9 +186,10 @@ struct MassagePlayerView: View {
     }
 
     private var timeLeft: String {
-        if index >= steps.count - 1 && left <= 1 { return "Almost done" }
         let total = Double(lengths.reduce(0, +))
         let minutes = max(1, Int((total * (1 - progress) / 60).rounded()))
+        if isPreview { return "Timer paused for the preview · about \(minutes) min left" }
+        if index >= steps.count - 1 && left <= 1 { return "Almost done" }
         return "About \(minutes) min left"
     }
 
@@ -211,7 +216,7 @@ struct MassagePlayerView: View {
         begin(0, greeting: greets ? "Good evening, \(appState.child). " : "")
     }
 
-    /// Seconds of "Watch first" before each step.
+    /// Seconds of preview before each step.
     private let previewSeconds = 6
 
     /// Opens a step with its preview. Roll-over steps are self-explanatory, so they skip it.
@@ -226,7 +231,7 @@ struct MassagePlayerView: View {
         } else {
             isPreview = true
             left = previewSeconds
-            speak(greeting + "Watch first. \(step.cue.personalized(appState.child)).")
+            speak(greeting + "Preview. \(step.cue.personalized(appState.child)).")
         }
     }
 
@@ -287,35 +292,43 @@ struct RitualEndView: View {
     private let lengths: [(minutes: Int, label: String)] = [(0, "Off"), (20, "20 min"), (60, "1 hour"), (120, "2 hours")]
 
     var body: some View {
-        VStack(spacing: AJSpacing.md + 2) {
-            ZStack {
-                AJMoon(size: 130)
-                AJStar(size: 40)
-                    .offset(x: starLanded ? 34 : -76, y: starLanded ? -40 : 110)
-                    .scaleEffect(starLanded ? 1 : 0.3)
-                    .rotationEffect(.degrees(starLanded ? 0 : -90))
-                    .opacity(starLanded ? 1 : 0)
-            }
-            .frame(height: 130)
-            .accessibilityHidden(true)
-            Text("Sweet dreams").ajText(.display)
-            Text("A new star on \(appState.child)'s moon").ajText(.callout, color: AJColor.starGlow)
-            VStack(spacing: 10) {
-                Text(appState.affirmationMinutes > 0 ? "Affirmations are starting" : "Affirmations are off").ajText(.callout)
-                FlowLayout(spacing: AJSpacing.xs) {
-                    ForEach(lengths, id: \.minutes) { option in
-                        AJChoiceChip(option.label, isSelected: appState.affirmationMinutes == option.minutes) {
-                            appState.affirmationMinutes = option.minutes
-                            playAffirmations()
+        VStack(spacing: 0) {
+            // Everything sits in the middle of the screen; the note and button stay at the bottom.
+            Spacer(minLength: AJSpacing.md)
+            VStack(spacing: AJSpacing.md) {
+                ZStack {
+                    AJMoon(size: 130)
+                    AJStar(size: 40)
+                        .offset(x: starLanded ? 22 : -76, y: starLanded ? -18 : 110)
+                        .scaleEffect(starLanded ? 1 : 0.3)
+                        .rotationEffect(.degrees(starLanded ? 0 : -90))
+                        .opacity(starLanded ? 1 : 0)
+                }
+                .frame(height: 130)
+                .accessibilityHidden(true)
+                Text("Sweet dreams").ajText(.display)
+                Text("A new star in \(appState.child)'s sky").ajText(.callout, color: AJColor.starGlow)
+                VStack(spacing: 10) {
+                    Text(appState.affirmationMinutes > 0 ? "Affirmations are starting" : "Affirmations are off").ajText(.callout)
+                    HStack(spacing: AJSpacing.xs) {
+                        ForEach(lengths, id: \.minutes) { option in
+                            AJChoiceChip(option.label, isSelected: appState.affirmationMinutes == option.minutes) {
+                                appState.affirmationMinutes = option.minutes
+                                playAffirmations()
+                            }
                         }
                     }
+                    Text("They play from this device, so leave it in \(appState.child)'s room. A tablet works well if you need your phone.")
+                        .ajText(.footnote, color: AJColor.textSecondary)
+                        .frame(maxWidth: 300)
                 }
-                Text("They play from this device, so leave it in \(appState.child)'s room. A tablet works well if you need your phone.")
-                    .ajText(.footnote, color: AJColor.textSecondary)
+                .padding(.top, AJSpacing.sm)
             }
-            .padding(.top, AJSpacing.xs)
-            Spacer(minLength: 0)
-            Text("No questions tonight. The screen goes dark in a few seconds.").ajText(.footnote, color: AJColor.textTertiary)
+            .frame(maxWidth: .infinity)
+            Spacer(minLength: AJSpacing.md)
+            Text("No questions tonight. The screen goes dark in a few seconds.")
+                .ajText(.footnote, color: AJColor.textTertiary)
+                .padding(.bottom, AJSpacing.sm)
             Button("Goodnight") { router.open(.dark) }.buttonStyle(.ajPrimary)
         }
         .multilineTextAlignment(.center)
@@ -366,15 +379,26 @@ struct CheckInGroup: View {
     @Binding var selection: String?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(spacing: 10) {
             Text(title).ajText(.callout)
-            FlowLayout(spacing: AJSpacing.xs) {
-                ForEach(options, id: \.self) { option in
-                    AJChoiceChip(option, isSelected: selection == option) { selection = option }
+            // Answers wrap onto a second row when they don't fit; each row is centred.
+            ViewThatFits(in: .horizontal) {
+                chipRow(options)
+                VStack(spacing: AJSpacing.xs) {
+                    chipRow(Array(options.prefix((options.count + 1) / 2)))
+                    chipRow(Array(options.suffix(options.count / 2)))
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity)
+    }
+
+    private func chipRow(_ items: [String]) -> some View {
+        HStack(spacing: AJSpacing.xs) {
+            ForEach(items, id: \.self) { option in
+                AJChoiceChip(option, isSelected: selection == option) { selection = option }
+            }
+        }
     }
 }
 

@@ -39,16 +39,22 @@ scripts/check-fonts.sh          Fails if any screen styles fonts outside the des
 
 ## The main app
 Built screen for screen from the approved prototype. Three tabs:
-- **Tonight**: one button. "How's the skin tonight?" (Calm → tonight's massage story, Flaring → the shorter
-  gentle story), then the follow-along player: each step opens with a few seconds of "Watch first" (the hands
-  show the move, the voice says what to do), then "Your turn" with the story. At the end a star lands on the moon
-  and affirmations start by themselves (off, 20 minutes, 1 hour or 2 hours); nothing is asked at night and the
-  screen goes dark. One notification the next morning asks three quick questions plus a story rating, and the
-  result shows a small reward every day. Tonight's story changes every three nights.
-- **Stories**: massage stories, audio-only bedtime stories (5, 10 or 20 minutes), affirmations, calm moments,
-  favorites, and Create a story.
-- **Progress**: time back for you, this month's moon, itch trend, rings, milestones, totals, research.
-  Every number comes from the family's own check-ins; sections show a short note until there is enough data.
+- **Tonight**: tonight's story as a picture-book banner and one button. "How's the skin tonight?" (Calm → tonight's
+  massage story, Flaring → the shorter gentle story), then the follow-along player: each step opens with a short
+  "Preview" (the timer pauses, the hands show the move, the voice says what to do), then "Your turn" with the story
+  and a scene from it behind the figure. At the end a star lands and affirmations start by themselves (off,
+  20 minutes, 1 hour or 2 hours); nothing is asked at night and the screen goes dark. Tonight's story changes every
+  three nights.
+- **The next morning**: one notification, and the check-in opens as its own screen over the home screen: three quick
+  questions plus a story rating, then a result screen with a small reward every day. "Later" leaves a button on Tonight.
+- **Stories**: shelves of picture-book covers: massage stories, audio-only bedtime stories (5, 10 or 20 minutes),
+  affirmations, calm moments, favorites, and Create a story.
+- **Progress**: the child's sky (every finished night is a star; five make a constellation; color shows calm, itchy
+  and flare nights), time back for you, itch trend, rings, milestones, totals, research. Every number comes from the
+  family's own check-ins; sections show a short note until there is enough data.
+
+Story covers, the banner and the massage scenes are placeholder drawings generated from the prototype by
+`scripts/generate-story-art.py` (`Alji/Main/StoryArtData.swift`). Swap in final art in `Alji/Main/StoryArtViews.swift`.
 
 Free version: `StoryCatalog.freeIDs` in `Alji/Main/MainRouter.swift`. Everything else opens the paywall.
 

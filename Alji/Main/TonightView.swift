@@ -1,41 +1,32 @@
 import SwiftUI
 import AljiDesignSystem
 
-/// Tonight: one screen, one button. Changes by itself from bedtime, to goodnight, to the morning check-in, to the result.
+/// Tonight: tonight's story as a picture-book banner, and one button. After the ritual it says goodnight.
+/// The morning check-in is a separate screen that opens by itself (see `MorningCheckInView`).
 struct TonightView: View {
     @Environment(AppState.self) private var appState
     @Environment(MainRouter.self) private var router
 
-    @State private var itch: String?
-    @State private var rating = 0
-    @State private var fall: String?
-    @State private var wakes: String?
-
     private var child: String { appState.child }
 
     var body: some View {
+        let phase = appState.phase()
         VStack(spacing: 14) {
-            switch appState.phase() {
-            case .bedtime: bedtime
-            case .after: after
-            case .morning: morning
-            case .result: result
-            }
+            if phase == .after { after } else { bedtime(hasPendingCheckIn: phase == .morning) }
         }
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)
         .padding(.top, 10)
     }
 
-    // MARK: Bedtime
-
     @ViewBuilder
-    private var bedtime: some View {
+    private func bedtime(hasPendingCheckIn: Bool) -> some View {
         let story = TonightPlan.story(appState)
-        AJMoon(size: 150)
-        Text(appState.isNewStoryTonight ? "New story tonight for \(child)" : "Tonight with \(child)").ajText(.label, color: AJColor.accentWarm)
-        Text(story.title.personalized(child)).ajText(.display)
-        Text("\(TonightPlan.minutes(appState)) minutes · screen-free for \(child)").ajText(.callout, color: AJColor.textSecondary)
+        StoryBanner(storyID: story.id, color: Color(hex: story.color),
+                    label: appState.isNewStoryTonight ? "New story tonight for \(child)" : "Tonight with \(child)",
+                    minutes: "\(TonightPlan.minutes(appState)) min")
+        Text(story.title.personalized(child)).ajText(.display).padding(.top, AJSpacing.xxs)
+        Text("Screen-free for \(child)").ajText(.callout, color: AJColor.textSecondary)
         Button("Start tonight's ritual") { router.panel = .skin }
             .buttonStyle(.ajPrimary)
             .padding(.top, 14)
@@ -43,7 +34,20 @@ struct TonightView: View {
             Button("Change story") { appState.selectedTab = .stories }.buttonStyle(.ajOutline)
             Button("Tonight's plan") { router.panel = .plan }.buttonStyle(.ajOutline)
         }
-        Text(quietLine).ajText(.subhead, color: AJColor.textTertiary).padding(.top, 10)
+        if hasPendingCheckIn {
+            Button { router.open(.morning) } label: {
+                Text("Answer last night's check-in")
+                    .ajText(.subhead, color: AJColor.accentWarm)
+                    .padding(.horizontal, AJSpacing.md)
+                    .frame(minHeight: AJSize.minTouch)
+                    .background(AJColor.accentWarm.opacity(0.1), in: Capsule())
+                    .overlay(Capsule().strokeBorder(AJColor.accentWarm, lineWidth: 1.5))
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 6)
+        } else {
+            Text(quietLine).ajText(.subhead, color: AJColor.textTertiary).padding(.top, 10)
+        }
     }
 
     /// A quiet line of real progress under the buttons.
@@ -56,8 +60,6 @@ struct TonightView: View {
         return night == 1 ? "Night 1 · \(child)'s first star is waiting" : "Night \(night) of \(child)'s bedtime ritual"
     }
 
-    // MARK: After the ritual
-
     @ViewBuilder
     private var after: some View {
         AJMoon(size: 150)
@@ -65,84 +67,143 @@ struct TonightView: View {
         Text("Rest now. One quiet notification in the morning will ask how the night went.")
             .ajText(.callout, color: AJColor.textSecondary)
     }
+}
 
-    // MARK: Morning
+// MARK: - The next morning
 
-    @ViewBuilder
-    private var morning: some View {
-        Text("Good morning").ajText(.label, color: AJColor.accentWarm)
-        AJHighlightedTitle("How did *\(child)* sleep?")
-        VStack(alignment: .leading, spacing: AJSpacing.md + 2) {
-            CheckInGroup(title: "How itchy was last night?", options: CheckIn.itch, selection: $itch)
-            CheckInGroup(title: "How long did \(child) take to fall asleep?", options: CheckIn.fall, selection: $fall)
-            CheckInGroup(title: "Wake-ups in the night?", options: CheckIn.wakes, selection: $wakes)
-            VStack(alignment: .leading, spacing: AJSpacing.xs) {
-                Text("Did \(child) enjoy last night's story?").ajText(.callout)
-                HStack(spacing: AJSpacing.xs) {
-                    ForEach(1...5, id: \.self) { value in
-                        Button { rating = value } label: {
-                            AJStar(size: 34, isLit: value <= rating).frame(width: 48, height: 48)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("\(value) stars")
-                        .accessibilityAddTraits(value == rating ? .isSelected : [])
-                    }
+/// "How did they sleep?" Its own screen, opened over the home screen in the morning.
+struct MorningCheckInView: View {
+    @Environment(AppState.self) private var appState
+    @Environment(MainRouter.self) private var router
+
+    @State private var itch: String?
+    @State private var fall: String?
+    @State private var wakes: String?
+    @State private var rating = 0
+
+    var body: some View {
+        let child = appState.child
+        VStack(spacing: 0) {
+            HStack {
+                Spacer()
+                Button {
+                    router.checkInSnoozed = true
+                    router.close()
+                } label: {
+                    Text("Later")
+                        .ajText(.subhead)
+                        .padding(.horizontal, 14)
+                        .frame(minHeight: AJSize.minTouch)
+                        .overlay(Capsule().strokeBorder(AJColor.borderQuiet, lineWidth: 1.5))
                 }
+                .buttonStyle(.plain)
             }
+            .padding(.horizontal, AJSpacing.lg)
+            .padding(.top, AJSpacing.xs)
+            ScrollView {
+                VStack(spacing: 14) {
+                    Text("Good morning").ajText(.label, color: AJColor.accentWarm)
+                    AJHighlightedTitle("How did *\(child)* sleep?")
+                    VStack(spacing: AJSpacing.md + 2) {
+                        CheckInGroup(title: "How itchy was last night?", options: CheckIn.itch, selection: $itch)
+                        CheckInGroup(title: "How long did \(child) take to fall asleep?", options: CheckIn.fall, selection: $fall)
+                        CheckInGroup(title: "Wake-ups in the night?", options: CheckIn.wakes, selection: $wakes)
+                        VStack(spacing: AJSpacing.xs) {
+                            Text("Did \(child) enjoy last night's story?").ajText(.callout)
+                            HStack(spacing: AJSpacing.xs) {
+                                ForEach(1...5, id: \.self) { value in
+                                    Button { rating = value } label: {
+                                        AJStar(size: 34, isLit: value <= rating).frame(width: 48, height: 48)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .accessibilityLabel("\(value) stars")
+                                    .accessibilityAddTraits(value == rating ? .isSelected : [])
+                                }
+                            }
+                        }
+                    }
+                    .padding(.top, 6)
+                }
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, AJSpacing.lg)
+                .padding(.top, AJSpacing.xs)
+                .frame(maxWidth: .infinity)
+            }
+            Button("See how last night went") {
+                guard let itch, let fall, let wakes else { return }
+                appState.saveMorning(itch: itch, rating: rating, fallMinutes: CheckIn.fallMinutes(fall), wakes: CheckIn.wakeCount(wakes))
+                router.checkInSnoozed = false
+                router.open(.result)
+            }
+            .buttonStyle(.ajPrimary)
+            .disabled(itch == nil || fall == nil || wakes == nil)
+            .padding(.horizontal, AJSpacing.lg)
+            .padding(.vertical, AJSpacing.md)
         }
-        .multilineTextAlignment(.leading)
-        .padding(.top, 6)
-        Button("See how last night went") {
-            guard let itch, let fall, let wakes else { return }
-            appState.saveMorning(itch: itch, rating: rating, fallMinutes: CheckIn.fallMinutes(fall), wakes: CheckIn.wakeCount(wakes))
-        }
-        .buttonStyle(.ajPrimary)
-        .disabled(itch == nil || fall == nil || wakes == nil)
-        .padding(.top, AJSpacing.xs)
-    }
-
-    // MARK: Result
-
-    @ViewBuilder
-    private var result: some View {
-        let last = appState.nights.last
-        let fell = last?.fallMinutes ?? 0
-        let wakeCount = last?.wakes ?? 0
-        let first = appState.nights.dropLast().first { $0.fallMinutes != nil }
-        let compare: String = {
-            guard let firstFall = first?.fallMinutes else { return "This is your starting point." }
-            return fell < firstFall ? "On night 1 it was \(firstFall)." : "Night 1 was \(firstFall). Hard nights happen."
-        }()
-        let wakeLine = wakeText(wakeCount) + (first?.wakes.map { " On night 1 there were \(countText($0))." } ?? "")
-        AJMoon(size: 110)
-        Text("Last night").ajText(.label, color: AJColor.accentWarm)
-        AJHighlightedTitle("\(child) fell asleep in *\(fell) minutes*.", style: .display)
-        Text(compare).ajText(.headline, color: AJColor.accentWarm)
-        Text(wakeLine).ajText(.callout, color: AJColor.textSecondary)
-        // A small reward every morning, from the very first night.
-        VStack(alignment: .leading, spacing: AJSpacing.xxs) {
-            Text("Star \(appState.nights.count) is on \(child)'s moon").ajText(.footnoteStrong, color: AJColor.accentWarm)
-            Text(morningTip(last?.itch)).ajText(.subhead)
-            Text("Tonight: \(TonightPlan.story(appState).title.personalized(child))").ajText(.footnote, color: AJColor.textSecondary)
-        }
-        .multilineTextAlignment(.leading)
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AJColor.accentWarm.opacity(0.1), in: RoundedRectangle(cornerRadius: AJRadius.md, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: AJRadius.md, style: .continuous).strokeBorder(AJColor.accentWarm.opacity(0.45), lineWidth: 1.5))
-        .padding(.top, 6)
-        ShareLink(item: "\(child) fell asleep in \(fell) minutes last night. \(compare) \(wakeLine)") {
-            Text("Share with your partner")
-        }
-        .buttonStyle(.ajPrimary)
-        .padding(.top, AJSpacing.md)
-        Button("See all progress") { appState.selectedTab = .progress }.buttonStyle(.ajGhost)
     }
 }
 
-private extension TonightView {
+/// Last night's result, with a small reward every morning from the very first night.
+struct MorningResultView: View {
+    @Environment(AppState.self) private var appState
+    @Environment(MainRouter.self) private var router
+
+    var body: some View {
+        let child = appState.child
+        let last = appState.nights.last
+        let fell = last?.fallMinutes ?? 0
+        let first = appState.nights.dropLast().first { $0.fallMinutes != nil }
+        let compare = compareLine(fell: fell, firstFall: first?.fallMinutes)
+        let wakeLine = wakeText(last?.wakes ?? 0) + (first?.wakes.map { " On night 1 there were \(countText($0))." } ?? "")
+        VStack(spacing: 14) {
+            Spacer(minLength: 0)
+            AJStar(size: 64)
+            Text("Last night").ajText(.label, color: AJColor.accentWarm)
+            AJHighlightedTitle("\(child) fell asleep in *\(fell) minutes*.", style: .display)
+            Text(compare).ajText(.headline, color: AJColor.accentWarm)
+            Text(wakeLine).ajText(.callout, color: AJColor.textSecondary)
+            VStack(alignment: .leading, spacing: AJSpacing.xxs) {
+                Text("Star \(appState.nights.count) is in \(child)'s sky").ajText(.footnoteStrong, color: AJColor.accentWarm)
+                Text(morningTip(last?.itch, child: child)).ajText(.subhead)
+                Text("Tonight: \(TonightPlan.story(appState).title.personalized(child))").ajText(.footnote, color: AJColor.textSecondary)
+            }
+            .multilineTextAlignment(.leading)
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(AJColor.accentWarm.opacity(0.1), in: RoundedRectangle(cornerRadius: AJRadius.md, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: AJRadius.md, style: .continuous).strokeBorder(AJColor.accentWarm.opacity(0.45), lineWidth: 1.5))
+            .padding(.top, 6)
+            ShareLink(item: "\(child) fell asleep in \(fell) minutes last night. \(compare) \(wakeLine)") {
+                Text("Share with your partner")
+            }
+            .buttonStyle(.ajPrimary)
+            .padding(.top, AJSpacing.md)
+            HStack(spacing: 10) {
+                Button("See progress") {
+                    appState.selectedTab = .progress
+                    router.close()
+                }
+                .buttonStyle(.ajOutline)
+                Button("Done") {
+                    appState.selectedTab = .tonight
+                    router.close()
+                }
+                .buttonStyle(.ajOutline)
+            }
+            Spacer(minLength: 0)
+        }
+        .multilineTextAlignment(.center)
+        .padding(.horizontal, AJSpacing.lg)
+        .padding(.vertical, AJSpacing.md)
+    }
+
+    private func compareLine(fell: Int, firstFall: Int?) -> String {
+        guard let firstFall else { return "This is your starting point." }
+        return fell < firstFall ? "On night 1 it was \(firstFall)." : "Night 1 was \(firstFall). Hard nights happen."
+    }
+
     /// One line that answers what the parent just told us.
-    func morningTip(_ itch: String?) -> String {
+    private func morningTip(_ itch: String?, child: String) -> String {
         switch itch {
         case "A bit itchy": return "A bit itchy, and \(child) still settled. The ritual is doing its job."
         case "Very itchy": return "Itchy nights are the hardest. If the skin is flaring tonight, choose Flaring for the gentler story."
@@ -150,9 +211,9 @@ private extension TonightView {
         }
     }
 
-    func countText(_ count: Int) -> String { count >= 3 ? "3+" : "\(count)" }
+    private func countText(_ count: Int) -> String { count >= 3 ? "3+" : "\(count)" }
 
-    func wakeText(_ count: Int) -> String {
+    private func wakeText(_ count: Int) -> String {
         switch count {
         case 0: return "No wake-ups."
         case 1: return "1 wake-up."

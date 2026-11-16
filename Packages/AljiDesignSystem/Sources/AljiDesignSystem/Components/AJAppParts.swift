@@ -85,57 +85,37 @@ public struct AJSwitchRow: View {
     }
 }
 
-/// A story in the library. Wide: art on the left. Compact: art on top, for side-scrolling rows.
-public struct AJStoryCard: View {
+/// A story in the library, shown as a picture-book cover with its title underneath.
+/// Pass the cover as `art`; it is cropped to a rounded 150 × 190 shape.
+public struct AJStoryCard<Art: View>: View {
     let title: String
     let meta: String
-    let color: Color
-    let isWide: Bool
+    let width: CGFloat
     let action: () -> Void
+    let art: Art
 
-    public init(title: String, meta: String, color: Color, isWide: Bool, action: @escaping () -> Void) {
+    public init(title: String, meta: String, width: CGFloat = 132, action: @escaping () -> Void, @ViewBuilder art: () -> Art) {
         self.title = title
         self.meta = meta
-        self.color = color
-        self.isWide = isWide
+        self.width = width
         self.action = action
-    }
-
-    private var art: some View {
-        RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .fill(LinearGradient(colors: [color, AJColor.surfaceDeep], startPoint: .topLeading, endPoint: .bottomTrailing))
-            .overlay(AJStar(size: 26))
-            .accessibilityHidden(true)
-    }
-
-    private var text: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(title).ajText(.callout).multilineTextAlignment(.leading)
-            Text(meta).ajText(.footnote, color: AJColor.textSecondary)
-        }
+        self.art = art()
     }
 
     public var body: some View {
         Button(action: action) {
-            Group {
-                if isWide {
-                    HStack(spacing: 14) {
-                        art.frame(width: 84, height: 84)
-                        text
-                        Spacer(minLength: 0)
-                    }
-                    .padding(AJSpacing.sm)
-                } else {
-                    VStack(alignment: .leading, spacing: 10) {
-                        art.frame(height: 96)
-                        text
-                        Spacer(minLength: 0)
-                    }
-                    .padding(10)
-                    .frame(width: 156)
+            VStack(alignment: .leading, spacing: AJSpacing.xs) {
+                art
+                    .frame(width: width, height: width * 190 / 150)
+                    .clipShape(RoundedRectangle(cornerRadius: AJRadius.md, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: AJRadius.md, style: .continuous).strokeBorder(Color.white.opacity(0.2), lineWidth: 1.5))
+                    .shadow(color: .black.opacity(0.3), radius: 10, y: 8)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title).ajText(.callout).multilineTextAlignment(.leading)
+                    Text(meta).ajText(.footnote, color: AJColor.textSecondary)
                 }
             }
-            .background(AJColor.surface, in: RoundedRectangle(cornerRadius: AJRadius.lg, style: .continuous))
+            .frame(width: width, alignment: .leading)
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
@@ -168,18 +148,23 @@ public struct AJSheetHeader: View {
     }
 }
 
-/// A thin progress track, used by the massage player.
+/// A thin progress track, used by the massage player. While paused it turns plain white, so it reads as "not counting".
 public struct AJProgressTrack: View {
     let progress: Double
+    let isPaused: Bool
 
-    public init(progress: Double) { self.progress = min(max(progress, 0), 1) }
+    public init(progress: Double, isPaused: Bool = false) {
+        self.progress = min(max(progress, 0), 1)
+        self.isPaused = isPaused
+    }
 
     public var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
                 Capsule().fill(Color.white.opacity(0.22))
                 Capsule()
-                    .fill(LinearGradient(colors: [AJColor.accentCalm, AJColor.accentWarm], startPoint: .leading, endPoint: .trailing))
+                    .fill(LinearGradient(colors: isPaused ? [Color.white.opacity(0.55), Color.white.opacity(0.55)] : [AJColor.accentCalm, AJColor.accentWarm],
+                                         startPoint: .leading, endPoint: .trailing))
                     .frame(width: geo.size.width * progress)
             }
         }
@@ -187,7 +172,7 @@ public struct AJProgressTrack: View {
         .animation(.linear(duration: 1), value: progress)
         .accessibilityElement()
         .accessibilityLabel("Progress")
-        .accessibilityValue("\(Int(progress * 100)) percent")
+        .accessibilityValue("\(Int(progress * 100)) percent" + (isPaused ? ", paused" : ""))
     }
 }
 

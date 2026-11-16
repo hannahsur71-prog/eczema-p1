@@ -6,6 +6,7 @@ struct MainTabView: View {
     @Environment(AppState.self) private var appState
     @State private var router = MainRouter()
     @State private var showSettings = false
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         ZStack {
@@ -26,8 +27,19 @@ struct MainTabView: View {
         .animation(.easeInOut(duration: 0.25), value: router.screen)
         .animation(.easeInOut(duration: 0.2), value: router.panel)
         .environment(router)
+        .onAppear(perform: openMorningCheckIn)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { openMorningCheckIn() }
+        }
         .sheet(isPresented: $showSettings) { SettingsView() }
         .sheet(isPresented: Bindable(router).showsUpgrade) { PaywallView(context: .upgrade) }
+    }
+
+    /// The morning after a ritual, the check-in opens over the home screen by itself.
+    private func openMorningCheckIn() {
+        if appState.phase() == .morning && router.screen == nil && !router.checkInSnoozed {
+            router.open(.morning)
+        }
     }
 
     private var tabs: some View {
@@ -107,6 +119,8 @@ struct MainTabView: View {
         case .player(let id, let isFlare, let greets): MassagePlayerView(storyID: id, isFlare: isFlare, greets: greets)
         case .end(let id, let minutes, let isFlare): RitualEndView(storyID: id, minutes: minutes, isFlare: isFlare)
         case .dark: AffirmationsDarkView()
+        case .morning: MorningCheckInView()
+        case .result: MorningResultView()
         case .audio(let id): AudioPlayerView(storyID: id)
         case .create: CreateStoryView()
         case .creating: CreatingStoryView()

@@ -90,23 +90,7 @@ struct ProgressStats {
         return Int(((last - first) / first * 100).rounded())
     }
 
-    // MARK: This month
-
-    struct Day: Identifiable {
-        let id: Int
-        /// nil: no ritual that day.
-        let entry: NightEntry?
-    }
-
-    var monthDays: [Day] {
-        let now = Date.now
-        let count = calendar.range(of: .day, in: .month, for: now)?.count ?? 30
-        return (1...count).map { day in
-            Day(id: day, entry: nights.last {
-                calendar.isDate($0.date, equalTo: now, toGranularity: .month) && calendar.component(.day, from: $0.date) == day
-            })
-        }
-    }
+    // MARK: The last four weeks
 
     private var last28: [NightEntry] {
         let since = calendar.date(byAdding: .day, value: -28, to: .now) ?? .now

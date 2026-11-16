@@ -9,6 +9,9 @@ enum MainScreen: Equatable {
     case player(storyID: String, isFlare: Bool, greets: Bool)
     case end(storyID: String, minutes: Int, isFlare: Bool)
     case dark
+    /// The morning check-in. Opens by itself the morning after a ritual.
+    case morning
+    case result
     case audio(String)
     case create
     case creating
@@ -26,6 +29,8 @@ final class MainRouter {
     /// A panel rising over the tabs.
     var panel: TonightPanel?
     var showsUpgrade = false
+    /// The parent tapped "Later" on the morning check-in. Tonight then shows a small button to answer it.
+    var checkInSnoozed = false
 
     @ObservationIgnored let narrator = Narrator()
     @ObservationIgnored let music = AmbientSoundEngine()

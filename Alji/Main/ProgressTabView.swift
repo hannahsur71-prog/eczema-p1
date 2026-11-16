@@ -1,7 +1,7 @@
 import SwiftUI
 import AljiDesignSystem
 
-/// Progress: time back for the parent first, then the month, itch, totals and what research shows.
+/// Progress: the child's sky of stars first, then time back for the parent, itch, totals and what research shows.
 struct ProgressTabView: View {
     @Environment(AppState.self) private var appState
 
@@ -11,8 +11,8 @@ struct ProgressTabView: View {
         let stats = ProgressStats(nights: appState.nights)
         VStack(alignment: .leading, spacing: 14) {
             AJHighlightedTitle("\(child)'s progress")
+            sky(stats)
             timeBack(stats)
-            moonCalendar(stats)
             itchTrend(stats)
             rings(stats)
             milestones(stats)
@@ -69,43 +69,42 @@ struct ProgressTabView: View {
                     in: RoundedRectangle(cornerRadius: 22, style: .continuous))
     }
 
-    // MARK: This month's moon
+    // MARK: The sky
 
-    private func moonColor(_ entry: NightEntry?) -> Color {
-        guard let entry else { return Color.white.opacity(0.08) }
+    private func starColor(_ entry: NightEntry) -> Color {
         if entry.wasFlare { return AJColor.coral }
         switch entry.itch {
-        case "Calm": return AJColor.accentWarm
-        case "A bit itchy": return Color(hex: 0xC9B98A)
-        case "Very itchy": return Color(hex: 0x8C86B8)
-        default: return Color(hex: 0xC9B98A)
+        case "A bit itchy", "Very itchy": return Color(hex: 0xB9B4DA)
+        default: return AJColor.starGlow
         }
     }
 
-    private func moonCalendar(_ stats: ProgressStats) -> some View {
-        panel {
+    private func sky(_ stats: ProgressStats) -> some View {
+        let total = stats.nights.count
+        let toNext = 5 - total % 5
+        return VStack(alignment: .leading, spacing: AJSpacing.xs) {
             HStack(alignment: .firstTextBaseline) {
-                Text("This month's moon").ajText(.callout).bold()
+                Text("\(child)'s sky").ajText(.title2).accessibilityAddTraits(.isHeader)
                 Spacer()
-                Text("brighter moon = calmer night").ajText(.footnote, color: AJColor.textSecondary)
+                Text("\(total) \(total == 1 ? "star" : "stars") · \(total / 5) \(total / 5 == 1 ? "constellation" : "constellations")")
+                    .ajText(.footnoteStrong, color: AJColor.starGlow)
             }
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: AJSpacing.xs), count: 7), spacing: AJSpacing.xs) {
-                ForEach(stats.monthDays) { day in
-                    VStack(spacing: 2) {
-                        AJMoon(size: 34, color: moonColor(day.entry))
-                        Text("\(day.id)").ajText(.footnote, color: AJColor.textTertiary)
-                    }
-                    .accessibilityElement()
-                    .accessibilityLabel("Day \(day.id): " + (day.entry.map { $0.wasFlare ? "flare night" : ($0.itch ?? "ritual done") } ?? "no ritual"))
-                }
-            }
-            HStack(spacing: 14) {
-                legend("Calm", AJColor.accentWarm)
-                legend("Itchy", Color(hex: 0x8C86B8))
-                legend("Flare", AJColor.coral)
-                legend("No log", Color.white.opacity(0.15))
+            NightSky(colors: stats.nights.suffix(NightSky.capacity).map(starColor))
+            Text(total == 0 ? "Every finished night adds a star to \(child)'s sky. Tonight's will be the first."
+                            : "Every finished night adds a star to \(child)'s sky. \(toNext) more \(toNext == 1 ? "night completes" : "nights complete") the next constellation.")
+                .ajText(.subhead, color: AJColor.textSecondary)
+            HStack(spacing: AJSpacing.sm) {
+                legend("Calm night", AJColor.starGlow)
+                legend("Itchy night", Color(hex: 0xB9B4DA))
+                legend("Flare night", AJColor.coral)
             }
         }
+        .padding(AJSpacing.md)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(LinearGradient(colors: [Color(hex: 0x101A52), Color(hex: 0x2A2470)], startPoint: .top, endPoint: .bottom),
+                    in: RoundedRectangle(cornerRadius: 26, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 26, style: .continuous).strokeBorder(AJColor.starGlow.opacity(0.25), lineWidth: 1.5))
+        .accessibilityElement(children: .combine)
     }
 
     private func legend(_ label: String, _ color: Color) -> some View {

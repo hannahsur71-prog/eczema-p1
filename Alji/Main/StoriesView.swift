@@ -34,15 +34,12 @@ struct StoriesView: View {
                         Text(section.title).ajText(.title2).accessibilityAddTraits(.isHeader)
                         Text(section.detail).ajText(.subhead, color: AJColor.textSecondary)
                     }
-                    if section.isWide {
-                        VStack(spacing: 10) { ForEach(section.items) { card($0, isWide: true) } }
-                    } else {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(alignment: .top, spacing: 10) { ForEach(section.items) { card($0, isWide: false) } }
-                        }
-                        .padding(.horizontal, -AJSpacing.screenGutter)
-                        .contentMargins(.horizontal, AJSpacing.screenGutter, for: .scrollContent)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(alignment: .top, spacing: AJSpacing.sm) { ForEach(section.items) { card($0, isWide: section.isWide) } }
+                            .padding(.bottom, AJSpacing.sm)
                     }
+                    .padding(.horizontal, -AJSpacing.screenGutter)
+                    .contentMargins(.horizontal, AJSpacing.screenGutter, for: .scrollContent)
                 }
             }
             if favoritesOnly && sections.isEmpty {
@@ -78,8 +75,10 @@ struct StoriesView: View {
 
     private func card(_ item: StoryItem, isWide: Bool) -> some View {
         let isLocked = !store.isSubscribed && !StoryCatalog.freeIDs.contains(item.id)
-        return AJStoryCard(title: item.title.personalized(appState.child), meta: item.meta, color: Color(hex: item.color), isWide: isWide) {
+        return AJStoryCard(title: item.title.personalized(appState.child), meta: item.meta, width: isWide ? 172 : 132) {
             router.openStory(item.id, isSubscribed: store.isSubscribed)
+        } art: {
+            StoryCoverArt(storyID: item.id, color: Color(hex: item.color))
         }
         .overlay(alignment: .topTrailing) {
             if isLocked {

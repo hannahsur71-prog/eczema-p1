@@ -140,13 +140,22 @@ public struct AJCatalogView: View {
                 AJChoiceChip("A bit itchy", isSelected: demoChip == 1) { demoChip = 1 }
             }
             Button("Tonight's plan") {}.buttonStyle(.ajOutline)
-            AJStoryCard(title: "Lumi and the Sleepy Comet", meta: "10 or 20 min · 1+", color: Color(hex: 0x7E63B8), isWide: true) {}
-            AJStoryCard(title: "You Are Loved", meta: "5 min · 2+", color: Color(hex: 0xB98A4A), isWide: false) {}
+            HStack(alignment: .top, spacing: AJSpacing.sm) {
+                AJStoryCard(title: "Lumi and the Sleepy Comet", meta: "10 or 20 min · 1+", width: 172, action: {}) {
+                    LinearGradient(colors: [Color(hex: 0x7E63B8), AJColor.surfaceDeep], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        .overlay(AJStar(size: 44))
+                }
+                AJStoryCard(title: "You Are Loved", meta: "5 min · 2+", action: {}) {
+                    LinearGradient(colors: [Color(hex: 0xB98A4A), AJColor.surfaceDeep], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        .overlay(AJStar(size: 34))
+                }
+            }
             AJSegmentedPicker("Massage length", options: [(value: false, label: "Full · 19 min"), (value: true, label: "Shorter · 8 min")],
                               selection: $demoShort)
             AJSheetHeader("How's *Maya's* skin tonight?") {}
             AJSwitchRow("Sleepy music", detail: "Soft and slow, under the story", isOn: $demoSwitch)
             AJProgressTrack(progress: 0.4)
+            AJProgressTrack(progress: 0.4, isPaused: true)
             AJFactCard(eyebrow: "Why it helps",
                        text: "Children massaged for 20 minutes each night with their moisturizer had less eczema than children who got moisturizer alone.",
                        source: "Schachner, Field et al., Pediatric Dermatology, 1998")
